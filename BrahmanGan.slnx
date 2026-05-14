@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="../tests/BrahmanGan.Application.Tests/BrahmanGan.Application.Tests.csproj" />
+  <Project Path="../tests/BrahmanGan.Domain.Tests/BrahmanGan.Domain.Tests.csproj" />
+  <Project Path="../tests/BrahmanGan.Infrastructure.Tests/BrahmanGan.Infrastructure.Tests.csproj" />
+  <Project Path="BrahmanGan.API/BrahmanGan.API.csproj" />
+  <Project Path="BrahmanGan.Application/BrahmanGan.Application.csproj" />
+  <Project Path="BrahmanGan.Domain/BrahmanGan.Domain.csproj" />
+  <Project Path="BrahmanGan.Infrastructure/BrahmanGan.Infrastructure.csproj" />
+</Solution>

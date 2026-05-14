@@ -1,0 +1,198 @@
+### BrahmanGan API - HTTP Testing File
+### Usa esta archivo con extensiones como REST Client para VS Code
+
+@baseUrl = http://localhost:5000
+@contentType = application/json
+
+### =================================
+### PRODUCTS ENDPOINTS
+### =================================
+
+### Get all products
+GET {{baseUrl}}/api/products
+
+###
+
+### Get product by ID
+GET {{baseUrl}}/api/products/1
+
+###
+
+### Get active products
+GET {{baseUrl}}/api/products/active
+
+###
+
+### Get products in stock
+GET {{baseUrl}}/api/products/in-stock
+
+###
+
+### Get products by price range
+GET {{baseUrl}}/api/products/price-range?minPrice=10&maxPrice=100
+
+###
+
+### Create new product
+POST {{baseUrl}}/api/products
+Content-Type: {{contentType}}
+
+{
+  "name": "Test Product",
+  "price": 99.99,
+  "description": "This is a test product",
+  "initialStock": 10
+}
+
+###
+
+### Update product price
+PUT {{baseUrl}}/api/products/1/price
+Content-Type: {{contentType}}
+
+{
+  "newPrice": 149.99
+}
+
+###
+
+### Add stock to product
+POST {{baseUrl}}/api/products/1/stock/add
+Content-Type: {{contentType}}
+
+{
+  "quantity": 5
+}
+
+###
+
+### Remove stock from product
+POST {{baseUrl}}/api/products/1/stock/remove
+Content-Type: {{contentType}}
+
+{
+  "quantity": 3
+}
+
+###
+
+### Deactivate product
+POST {{baseUrl}}/api/products/1/deactivate
+
+###
+
+### Activate product
+POST {{baseUrl}}/api/products/1/activate
+
+###
+
+### =================================
+### CUSTOMERS ENDPOINTS
+### =================================
+
+### Get all customers
+GET {{baseUrl}}/api/customers
+
+###
+
+### Get customer by ID
+GET {{baseUrl}}/api/customers/1
+
+###
+
+### Get active customers
+GET {{baseUrl}}/api/customers/active
+
+###
+
+### Create new customer
+POST {{baseUrl}}/api/customers
+Content-Type: {{contentType}}
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com"
+}
+
+###
+
+### Update customer email
+PUT {{baseUrl}}/api/customers/1/email
+Content-Type: {{contentType}}
+
+{
+  "newEmail": "john.newemail@example.com"
+}
+
+###
+
+### Deactivate customer
+POST {{baseUrl}}/api/customers/1/deactivate
+
+###
+
+### =================================
+### ORDERS ENDPOINTS
+### =================================
+
+### Get all orders
+GET {{baseUrl}}/api/orders
+
+###
+
+### Get order by ID
+GET {{baseUrl}}/api/orders/1
+
+###
+
+### Get orders by customer
+GET {{baseUrl}}/api/orders/customer/1
+
+###
+
+### Get pending orders
+GET {{baseUrl}}/api/orders/pending
+
+###
+
+### Create new order
+POST {{baseUrl}}/api/orders
+Content-Type: {{contentType}}
+
+{
+  "customerId": 1
+}
+
+###
+
+### Add item to order
+POST {{baseUrl}}/api/orders/1/items
+Content-Type: {{contentType}}
+
+{
+  "productId": 1,
+  "quantity": 2
+}
+
+###
+
+### Confirm order
+POST {{baseUrl}}/api/orders/1/confirm
+
+###
+
+### Ship order
+POST {{baseUrl}}/api/orders/1/ship
+
+###
+
+### Deliver order
+POST {{baseUrl}}/api/orders/1/deliver
+
+###
+
+### Cancel order
+POST {{baseUrl}}/api/orders/1/cancel
+
+###
