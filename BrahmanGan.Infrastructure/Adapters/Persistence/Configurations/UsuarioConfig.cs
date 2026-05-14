@@ -1,35 +1,52 @@
+using BrahmanGan.Domain.Modulos.Seguridad;
+using BrahmanGan.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using BrahmanGan.Domain.Common;
-using BrahmanGan.Domain.Modulos.Seguridad;
 
 namespace BrahmanGan.Infrastructure.Adapters.Persistence.Configurations;
 
 // ─────────────────────────────────────────────────────────────
 //  Usuario
 // ─────────────────────────────────────────────────────────────
-internal class UsuarioConfig : IEntityTypeConfiguration<Usuario>
+public class UsuarioConfig : IEntityTypeConfiguration<Usuario>
 {
-    public void Configure(EntityTypeBuilder<Usuario> b)
+    public void Configure(EntityTypeBuilder<Usuario> builder)
     {
-        b.ToTable("Usuarios");
-        b.HasKey(x => x.Id);
-        b.Property(x => x.Id)
-            .HasConversion(id => id.Value, v => UsuarioId.From(v))
+        builder.ToTable("Usuarios");
+
+        // Configuración del Id tipado como UsuarioId (int en el DB)
+        builder.HasKey(u => u.Id);
+
+        builder.Property(u => u.Id)
+            .HasConversion(v => (int)v, v => UsuarioId.From(v))
             .ValueGeneratedOnAdd();
 
-        b.Property(x => x.Email).HasMaxLength(200).IsRequired();
-        b.Property(x => x.NombreCompleto).HasMaxLength(200).IsRequired();
-        b.Property(x => x.PasswordHash).HasMaxLength(500);
-        b.Property(x => x.RefreshToken).HasMaxLength(500);
-        b.Property(x => x.RefreshTokenExpira);
-        b.Property(x => x.Proveedor).HasConversion<string>().HasMaxLength(30);
-        b.Property(x => x.IdExterno).HasMaxLength(200);
-        b.Property(x => x.EmailConfirmado);
-        b.Property(x => x.Activo);
-        b.Property(x => x.FechaCreacion);
-        b.Property(x => x.UltimoAcceso);
+        builder.Property(u => u.Email)
+            .IsRequired()
+            .HasMaxLength(200);
 
-        b.HasIndex(x => x.Email).IsUnique();
+        builder.Property(u => u.NombreCompleto)
+            .IsRequired()
+            .HasMaxLength(200);
+
+        builder.Property(u => u.PasswordHash).HasMaxLength(500);
+
+        builder.Property(u => u.RefreshToken).HasMaxLength(500);
+
+        builder.Property(u => u.Proveedor)
+            .IsRequired();
+
+        builder.Property(u => u.IdExterno).HasMaxLength(200);
+
+        builder.Property(u => u.EmailConfirmado).IsRequired();
+        builder.Property(u => u.Activo).IsRequired();
+
+        builder.Property(u => u.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+
+        // Relaciones
+        builder.HasMany(typeof(UsuarioRol), "_usuariosRol")
+            .WithOne("Usuario")
+            .HasForeignKey("UsuarioId")
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

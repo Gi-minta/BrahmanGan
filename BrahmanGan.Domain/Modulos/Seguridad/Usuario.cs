@@ -35,7 +35,6 @@ public sealed class Usuario : AggregateRoot<UsuarioId>
             throw new BusinessRuleException("El hash de contraseña es requerido.");
         return new Usuario
         {
-            Id = UsuarioId.New(),
             Email = email.ToLowerInvariant().Trim(),
             NombreCompleto = nombreCompleto.Trim(),
             PasswordHash = passwordHash,
@@ -55,7 +54,6 @@ public sealed class Usuario : AggregateRoot<UsuarioId>
             throw new BusinessRuleException("El identificador externo es requerido para OAuth2.");
         return new Usuario
         {
-            Id = UsuarioId.New(),
             Email = email.ToLowerInvariant().Trim(),
             NombreCompleto = nombreCompleto.Trim(),
             Proveedor = proveedor,

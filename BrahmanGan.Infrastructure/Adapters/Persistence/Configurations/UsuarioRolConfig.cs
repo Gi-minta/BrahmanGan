@@ -1,28 +1,37 @@
+using BrahmanGan.Domain.Modulos.Seguridad;
+using BrahmanGan.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using BrahmanGan.Domain.Common;
-using BrahmanGan.Domain.Modulos.Seguridad;
 
 namespace BrahmanGan.Infrastructure.Adapters.Persistence.Configurations;
 
 // ─────────────────────────────────────────────────────────────
 //  UsuarioRol  (junction table)
 // ─────────────────────────────────────────────────────────────
-internal class UsuarioRolConfig : IEntityTypeConfiguration<UsuarioRol>
+public class UsuarioRolConfig : IEntityTypeConfiguration<UsuarioRol>
 {
-    public void Configure(EntityTypeBuilder<UsuarioRol> b)
+    public void Configure(EntityTypeBuilder<UsuarioRol> builder)
     {
-        b.ToTable("UsuariosRoles");
-        b.HasKey(x => new { x.UsuarioId, x.RolId });
+        builder.ToTable("UsuariosRoles");
 
-        b.Property(x => x.UsuarioId)
-            .HasConversion(id => id.Value, v => UsuarioId.From(v));
-        b.Property(x => x.RolId)
-            .HasConversion(id => id.Value, v => RolId.From(v));
+        builder.HasKey("Id");
 
-        b.HasOne(x => x.Rol)
-            .WithMany(r => r.UsuariosRol)
-            .HasForeignKey(x => x.RolId)
+        builder.Property<int>("Id").ValueGeneratedOnAdd();
+
+        builder.Property< int >("UsuarioId")
+            .HasConversion(v => (int)v, v => UsuarioId.From(v));
+
+        builder.Property< int >("RolId")
+            .HasConversion(v => (int)v, v => RolId.From(v));
+
+        builder.HasOne(ur => ur.Usuario)
+            .WithMany("UsuariosRol")
+            .HasForeignKey("UsuarioId")
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(ur => ur.Rol)
+            .WithMany("UsuariosRol")
+            .HasForeignKey("RolId")
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -2,13 +2,20 @@ using BrahmanGan.Domain.Common;
 
 namespace BrahmanGan.Domain.Modulos.Seguridad;
 
-/// <summary>Tabla de unión Usuario ↔ Rol.</summary>
-public sealed class UsuarioRol
+public sealed class UsuarioRol : Entity<UsuarioRolId>
 {
-    public UsuarioId UsuarioId { get; }
-    public RolId RolId { get; }
-    public Rol? Rol { get; }
+    public UsuarioId UsuarioId { get; private set; }
+    public RolId RolId { get; private set; }
 
-    private UsuarioRol() { UsuarioId = UsuarioId.New(); RolId = RolId.New(); }
-    public UsuarioRol(UsuarioId usuarioId, RolId rolId) { UsuarioId = usuarioId; RolId = rolId; }
+    // Navegación
+    public Usuario? Usuario { get; private set; }
+    public Rol? Rol { get; private set; }
+
+    private UsuarioRol() { }
+
+    public UsuarioRol(UsuarioId usuarioId, RolId rolId)
+    {
+        UsuarioId = usuarioId;
+        RolId = rolId;
+    }
 }
