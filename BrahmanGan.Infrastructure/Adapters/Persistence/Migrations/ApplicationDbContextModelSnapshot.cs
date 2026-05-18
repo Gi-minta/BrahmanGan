@@ -3843,7 +3843,9 @@ namespace BrahmanGan.Infrastructure.Adapters.Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -3869,10 +3871,8 @@ namespace BrahmanGan.Infrastructure.Adapters.Persistence.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<string>("Proveedor")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                    b.Property<int>("Proveedor")
+                        .HasColumnType("int");
 
                     b.Property<string>("RefreshToken")
                         .HasMaxLength(500)
@@ -3892,23 +3892,40 @@ namespace BrahmanGan.Infrastructure.Adapters.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
-                        .IsUnique();
-
                     b.ToTable("Usuarios", (string)null);
                 });
 
             modelBuilder.Entity("BrahmanGan.Domain.Modulos.Seguridad.UsuarioRol", b =>
                 {
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("AsignadoEn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("AsignadoPor")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EliminadoEn")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("RolId")
                         .HasColumnType("int");
 
-                    b.HasKey("UsuarioId", "RolId");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("RolId");
+
+                    b.HasIndex("UsuarioId");
 
                     b.ToTable("UsuariosRoles", (string)null);
                 });
@@ -4171,13 +4188,15 @@ namespace BrahmanGan.Infrastructure.Adapters.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BrahmanGan.Domain.Modulos.Seguridad.Usuario", null)
+                    b.HasOne("BrahmanGan.Domain.Modulos.Seguridad.Usuario", "Usuario")
                         .WithMany("UsuariosRol")
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Rol");
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("BrahmanGan.Domain.Modulos.Comercial.CotizacionVenta", b =>

@@ -3,4 +3,7 @@ using BrahmanGan.Domain.Modulos.Finca;
 
 namespace BrahmanGan.Application.Ports.Output;
 
-public interface IGrupoManejoRepository : IRepository<GrupoManejo, GrupoManejoId> { }
+public interface IGrupoManejoRepository : IRepository<GrupoManejo, GrupoManejoId>
+{
+    Task<IReadOnlyList<GrupoManejo>> ListActivosAsync(CancellationToken ct = default);
+}

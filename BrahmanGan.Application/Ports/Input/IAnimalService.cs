@@ -11,4 +11,10 @@ public interface IAnimalService
     Task<IReadOnlyList<AnimalResponse>> ListarActivosAsync(CancellationToken ct = default);
     Task CambiarEstadoAsync(int id, CambiarEstadoAnimalRequest req, CancellationToken ct = default);
     Task TrasladarAsync(int id, TrasladarAnimalRequest req, CancellationToken ct = default);
+
+    Task<IReadOnlyList<HistorialAnimalResponse>> ListarHistorialAsync(int idAnimal, CancellationToken ct = default);
+    Task<IReadOnlyList<MovimientoAnimalResponse>> ListarMovimientosAsync(int idAnimal, CancellationToken ct = default);
+
+    Task<PedigriResponse> CrearPedigriAsync(CrearPedigriRequest req, CancellationToken ct = default);
+    Task<PedigriResponse?> ObtenerPedigriAsync(int idAnimal, CancellationToken ct = default);
 }

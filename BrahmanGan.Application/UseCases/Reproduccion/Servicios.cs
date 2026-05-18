@@ -10,8 +10,13 @@ namespace BrahmanGan.Application.UseCases.Reproduccion;
 public sealed class ServicioReproductivoService : IServicioReproductivoService
 {
     private readonly IServicioRepository _repo;
+    private readonly ISemenRepository _semenRepo;
+    private readonly INacimientoRepository _nacRepo;
     private readonly IUnitOfWork _uow;
-    public ServicioReproductivoService(IServicioRepository repo, IUnitOfWork uow) { _repo = repo; _uow = uow; }
+
+    public ServicioReproductivoService(IServicioRepository repo, ISemenRepository semenRepo,
+        INacimientoRepository nacRepo, IUnitOfWork uow)
+    { _repo = repo; _semenRepo = semenRepo; _nacRepo = nacRepo; _uow = uow; }
 
     public async Task<ServicioResponse> RegistrarMontaAsync(RegistrarMontaRequest req, CancellationToken ct = default)
     {
@@ -39,6 +44,39 @@ public sealed class ServicioReproductivoService : IServicioReproductivoService
 
     public async Task<IReadOnlyList<ServicioResponse>> ListarPorHembraAsync(int idHembra, CancellationToken ct = default)
         => (await _repo.ListByHembraAsync(AnimalId.From(idHembra), ct)).Select(s => s.ToDto()).ToList();
+
+    public async Task<SemenResponse> CrearSemenAsync(CrearSemenRequest req, CancellationToken ct = default)
+    {
+        if (await _semenRepo.GetByCodigoAsync(req.Codigo, ct) is not null)
+            throw new BusinessRuleException($"Ya existe semen con código '{req.Codigo}'");
+        var semen = Semen.Crear(req.Codigo, req.NombreToro,
+            req.IdRaza is int r ? RazaId.From(r) : null, req.Casa, req.StockInicial);
+        await _semenRepo.AddAsync(semen, ct);
+        await _uow.SaveChangesAsync(ct);
+        return semen.ToDto();
+    }
+
+    public async Task<SemenResponse?> ObtenerSemenAsync(int id, CancellationToken ct = default)
+        => (await _semenRepo.GetByIdAsync(SemenId.From(id), ct))?.ToDto();
+
+    public async Task<IReadOnlyList<SemenResponse>> ListarSemenAsync(CancellationToken ct = default)
+        => (await _semenRepo.ListActivosAsync(ct)).Select(s => s.ToDto()).ToList();
+
+    public async Task<SemenResponse> AjustarStockSemenAsync(AjustarStockSemenRequest req, CancellationToken ct = default)
+    {
+        var semen = await _semenRepo.GetByIdAsync(SemenId.From(req.IdSemen), ct)
+            ?? throw new EntityNotFoundException(nameof(Semen), req.IdSemen);
+        if (req.Dosis > 0) semen.IngresarStock(req.Dosis);
+        else semen.ConsumirDosis(-req.Dosis);
+        await _uow.SaveChangesAsync(ct);
+        return semen.ToDto();
+    }
+
+    public async Task<NacimientoResponse?> ObtenerNacimientoAsync(int id, CancellationToken ct = default)
+        => (await _nacRepo.GetByIdAsync(NacimientoId.From(id), ct))?.ToDto();
+
+    public async Task<IReadOnlyList<NacimientoResponse>> ListarNacimientosPorGestacionAsync(int idGestacion, CancellationToken ct = default)
+        => (await _nacRepo.ListByGestacionAsync(GestacionId.From(idGestacion), ct)).Select(n => n.ToDto()).ToList();
 }
 
 public sealed class GestacionService : IGestacionService

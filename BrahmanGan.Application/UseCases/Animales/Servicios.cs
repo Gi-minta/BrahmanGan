@@ -4,15 +4,21 @@ using BrahmanGan.Application.Ports.Output;
 using BrahmanGan.Domain.Common;
 using BrahmanGan.Domain.Exceptions;
 using BrahmanGan.Domain.Modulos.Inventario;
+using BrahmanGan.Domain.Modulos.Reproduccion;
 
 namespace BrahmanGan.Application.UseCases.Animales;
 
 public sealed class AnimalService : IAnimalService
 {
     private readonly IAnimalRepository _repo;
+    private readonly IHistorialAnimalRepository _histRepo;
+    private readonly IMovimientoAnimalRepository _movRepo;
+    private readonly IPedigriRepository _pedigriRepo;
     private readonly IUnitOfWork _uow;
 
-    public AnimalService(IAnimalRepository repo, IUnitOfWork uow) { _repo = repo; _uow = uow; }
+    public AnimalService(IAnimalRepository repo, IHistorialAnimalRepository histRepo,
+        IMovimientoAnimalRepository movRepo, IPedigriRepository pedigriRepo, IUnitOfWork uow)
+    { _repo = repo; _histRepo = histRepo; _movRepo = movRepo; _pedigriRepo = pedigriRepo; _uow = uow; }
 
     public async Task<AnimalResponse> RegistrarAsync(CrearAnimalRequest req, CancellationToken ct = default)
     {
@@ -56,6 +62,28 @@ public sealed class AnimalService : IAnimalService
         a.Trasladar(FincaId.From(req.NuevaFinca));
         await _uow.SaveChangesAsync(ct);
     }
+
+    public async Task<IReadOnlyList<HistorialAnimalResponse>> ListarHistorialAsync(int idAnimal, CancellationToken ct = default)
+        => (await _histRepo.ListByAnimalAsync(AnimalId.From(idAnimal), ct)).Select(h => h.ToDto()).ToList();
+
+    public async Task<IReadOnlyList<MovimientoAnimalResponse>> ListarMovimientosAsync(int idAnimal, CancellationToken ct = default)
+        => (await _movRepo.ListByAnimalAsync(AnimalId.From(idAnimal), ct)).Select(mv => mv.ToDto()).ToList();
+
+    public async Task<PedigriResponse> CrearPedigriAsync(CrearPedigriRequest req, CancellationToken ct = default)
+    {
+        var ped = Pedigri.Crear(AnimalId.From(req.IdAnimal),
+            req.IdAbuelo1 is int a1 ? AnimalId.From(a1) : null,
+            req.IdAbuela1 is int b1 ? AnimalId.From(b1) : null,
+            req.IdAbuelo2 is int a2 ? AnimalId.From(a2) : null,
+            req.IdAbuela2 is int b2 ? AnimalId.From(b2) : null,
+            req.PuntajeMorfologia, req.Observaciones);
+        await _pedigriRepo.AddAsync(ped, ct);
+        await _uow.SaveChangesAsync(ct);
+        return ped.ToDto();
+    }
+
+    public async Task<PedigriResponse?> ObtenerPedigriAsync(int idAnimal, CancellationToken ct = default)
+        => (await _pedigriRepo.GetByAnimalAsync(AnimalId.From(idAnimal), ct))?.ToDto();
 }
 
 public sealed class RazaService : IRazaService

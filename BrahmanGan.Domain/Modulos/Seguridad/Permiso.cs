@@ -20,9 +20,6 @@ public sealed class Permiso : Common.AggregateRoot<Common.PermisoId>
     private readonly List<RolPermiso> _rolesPermiso = [];
     public IReadOnlyCollection<RolPermiso> RolesPermiso => _rolesPermiso.AsReadOnly();
 
-    // Auditoría (requerida)
-    public DateTime CreatedAt { get; private set; }
-
     private Permiso() { }
 
     public static Permiso Crear(ModuloSistema modulo, AccionPermiso accion, string descripcion)

@@ -1,0 +1,7 @@
+CedulaTrabajador|Fecha|ValorJornal|HorasTrabajadas|Concepto|CodigoCentroCosto
+12345678|2024-05-01|55000|8|Ordeño mañana y tarde|CC-ESP-01
+23456789|2024-05-01|60000|9|Mantenimiento potreros|CC-PAR-01
+34567890|2024-05-02|55000|8|Ordeño mañana y tarde|CC-ESP-01
+12345678|2024-05-03|55000|8|Ordeño y manejo sanitario|CC-ESP-02
+45678901|2024-05-04|70000|10|Marcación y pesaje lote novillos|CC-STA-01
+23456789|2024-05-05|60000|9|Aplicación herbicida potrero 2|CC-PAR-02

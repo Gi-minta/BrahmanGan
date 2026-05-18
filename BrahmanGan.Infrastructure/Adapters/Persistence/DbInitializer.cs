@@ -58,11 +58,14 @@ public static class DbInitializer
             // ── Crear usuario administrador ────────────────────────────
             var hash    = hasher.Hashear(AdminPassword);
             var usuario = Usuario.CrearLocal(AdminEmail, AdminNombre, hash);
-            // Confirmar email directamente (es el seed, no necesita verificación)
             usuario.ConfirmarEmail();
-            usuario.AsignarRol(rolAdmin);
 
+            // Guardar primero para que la BD genere el Id (int identity)
             await db.Usuarios.AddAsync(usuario);
+            await db.SaveChangesAsync();
+
+            // Asignar rol después de tener el Id real
+            usuario.AsignarRol(rolAdmin);
             await db.SaveChangesAsync();
 
             logger.LogInformation(

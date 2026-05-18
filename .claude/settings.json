@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem \"c:\\\\Users\\\\ger-8\\\\source\\\\repos\\\\PROYECTOS 2026 .NET\\\\GanaDat\\\\ganadero\\\\BrahmanGan\\\\src\\\\BrahmanGan.Web\\\\src\" -Recurse -Name | Where-Object { $_ -notmatch \"node_modules\" } | Sort-Object)"
+    ]
+  }
+}

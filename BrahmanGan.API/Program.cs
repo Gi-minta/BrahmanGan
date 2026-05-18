@@ -7,7 +7,10 @@ using BrahmanGan.API.Middleware;
 var builder = WebApplication.CreateBuilder(args);
 
 // ── Controladores ──────────────────────────────────────────────
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(opt =>
+        opt.JsonSerializerOptions.Converters.Add(
+            new System.Text.Json.Serialization.JsonStringEnumConverter()));
 
 // ── Swagger ────────────────────────────────────────────────────
 builder.Services.AddSwaggerDocumentation();

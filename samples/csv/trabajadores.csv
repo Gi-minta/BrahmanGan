@@ -1,0 +1,5 @@
+Cedula|Nombres|Apellidos|FechaIngreso|Cargo|SalarioBase|TipoContrato
+12345678|Carlos Alberto|Pérez López|2020-01-15|Mayordomo|1800000|INDEFINIDO
+23456789|María Claudia|González Ruiz|2021-03-01|Ordeñadora|1300000|INDEFINIDO
+34567890|José Antonio|Martínez Herrera|2022-06-15|Jornalero||OBRA_LABOR
+45678901|Luisa Fernanda|Castaño Ríos|2023-02-10|Auxiliar Veterinaria|1500000|FIJO

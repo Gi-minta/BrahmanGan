@@ -75,6 +75,28 @@ public static class DependencyInjection
         services.AddScoped<IContratoRepository, ContratoRepository>();
         services.AddScoped<ICotizacionVentaRepository, CotizacionVentaRepository>();
 
+        // Fase 7
+        services.AddScoped<ICentroCostoRepository, CentroCostoRepository>();
+        // Fase 8
+        services.AddScoped<ITrabajadorRepository, TrabajadorRepository>();
+        services.AddScoped<IPagoJornalRepository, PagoJornalRepository>();
+        services.AddScoped<ICapturaCarbonoRepository, CapturaCarbonoRepository>();
+        services.AddScoped<IConsumoAguaRepository, ConsumoAguaRepository>();
+        services.AddScoped<IEventoMedioambientalRepository, EventoMedioambientalRepository>();
+        services.AddScoped<IGastoGeneralRepository, GastoGeneralRepository>();
+        services.AddScoped<IIngresoRepository, IngresoRepository>();
+        services.AddScoped<IInsumoRepository, InsumoRepository>();
+        services.AddScoped<IKardexInsumoRepository, KardexInsumoRepository>();
+        services.AddScoped<IMaquinariaRepository, MaquinariaRepository>();
+        services.AddScoped<IMantenimientoEquipoRepository, MantenimientoEquipoRepository>();
+        services.AddScoped<IRegistroICARepository, RegistroICARepository>();
+
+        // Alimentación
+        services.AddScoped<IPlanAlimentacionRepository, PlanAlimentacionRepository>();
+        services.AddScoped<IDetallePlanAlimentacionRepository, DetallePlanAlimentacionRepository>();
+        // Pastoreo
+        services.AddScoped<IPlanPastoreoRepository, PlanPastoreoRepository>();
+
         // Seguridad
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         services.AddScoped<IRolRepository, RolRepository>();

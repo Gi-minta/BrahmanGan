@@ -1,0 +1,5 @@
+Fecha|CodigoCentroCosto|TipoIngreso|Valor|Concepto|Comprobante
+2024-05-01|CC-ESP-01|VentaLeche|336000|Venta leche primera quincena mayo|ING-2024-001
+2024-05-05|CC-PAR-01|VentaAnimal|4500000|Venta novillo BOV-007 580 kg|ING-2024-002
+2024-05-10|CC-STA-01|VentaLeche|274000|Venta leche segunda quincena abril|ING-2024-003
+2024-05-15|CC-ESP-02|Otro|120000|Alquiler potrero vecino 30 días|ING-2024-004

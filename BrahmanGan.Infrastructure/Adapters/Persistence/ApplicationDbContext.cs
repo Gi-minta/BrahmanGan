@@ -13,6 +13,8 @@ using BrahmanGan.Domain.Modulos.Trazabilidad;
 using BrahmanGan.Domain.Modulos.Equipos;
 using BrahmanGan.Domain.Modulos.Sostenibilidad;
 using BrahmanGan.Domain.Modulos.Seguridad;
+using BrahmanGan.Domain.Modulos.Alimentacion;
+using BrahmanGan.Domain.Modulos.Pastoreo;
 
 namespace BrahmanGan.Infrastructure.Adapters.Persistence;
 
@@ -103,6 +105,13 @@ public class ApplicationDbContext : DbContext
     public DbSet<CapturaCarbono> CapturaCarbono => Set<CapturaCarbono>();
     public DbSet<ConsumoAgua> ConsumosAgua => Set<ConsumoAgua>();
     public DbSet<EventoMedioambiental> EventosMedioambientales => Set<EventoMedioambiental>();
+
+    // ===== Alimentación =====
+    public DbSet<PlanAlimentacion> PlanesAlimentacion => Set<PlanAlimentacion>();
+    public DbSet<DetallePlanAlimentacion> DetallePlanAlimentacion => Set<DetallePlanAlimentacion>();
+
+    // ===== Pastoreo =====
+    public DbSet<PlanPastoreo> PlanesPastoreo => Set<PlanPastoreo>();
 
     // ===== Seguridad (Auth, Roles, Permisos) =====
     public DbSet<Usuario> Usuarios => Set<Usuario>();

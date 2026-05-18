@@ -192,3 +192,161 @@ public sealed class CrearCotizacionRequestValidator : AbstractValidator<CrearCot
         RuleFor(x => x.FechaVigencia).GreaterThanOrEqualTo(x => x.Fecha).When(x => x.FechaVigencia.HasValue);
     }
 }
+
+// ===== Fase 7: Costos =====
+public sealed class CrearCentroCostoRequestValidator : AbstractValidator<CrearCentroCostoRequest>
+{
+    public CrearCentroCostoRequestValidator()
+    {
+        RuleFor(x => x.Codigo).NotEmpty().MaximumLength(20);
+        RuleFor(x => x.Nombre).NotEmpty().MaximumLength(100);
+    }
+}
+
+public sealed class CrearGastoGeneralRequestValidator : AbstractValidator<CrearGastoGeneralRequest>
+{
+    public CrearGastoGeneralRequestValidator()
+    {
+        RuleFor(x => x.Concepto).NotEmpty().MaximumLength(200);
+        RuleFor(x => x.Valor).GreaterThanOrEqualTo(0);
+    }
+}
+
+public sealed class CrearIngresoRequestValidator : AbstractValidator<CrearIngresoRequest>
+{
+    public CrearIngresoRequestValidator()
+    {
+        RuleFor(x => x.IdCentro).GreaterThan(0);
+        RuleFor(x => x.TipoIngreso).NotEmpty().MaximumLength(50);
+        RuleFor(x => x.Valor).GreaterThan(0);
+    }
+}
+
+// ===== Fase 7: Almacén =====
+public sealed class CrearInsumoRequestValidator : AbstractValidator<CrearInsumoRequest>
+{
+    public CrearInsumoRequestValidator()
+    {
+        RuleFor(x => x.Codigo).NotEmpty().MaximumLength(20);
+        RuleFor(x => x.Nombre).NotEmpty().MaximumLength(100);
+        RuleFor(x => x.PrecioUnitario).GreaterThanOrEqualTo(0).When(x => x.PrecioUnitario.HasValue);
+        RuleFor(x => x.StockMinimo).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.StockInicial).GreaterThanOrEqualTo(0);
+    }
+}
+
+public sealed class RegistrarMovimientoKardexRequestValidator : AbstractValidator<RegistrarMovimientoKardexRequest>
+{
+    private static readonly string[] TiposValidos = ["ENTRADA", "SALIDA", "AJUSTE"];
+    public RegistrarMovimientoKardexRequestValidator()
+    {
+        RuleFor(x => x.IdInsumo).GreaterThan(0);
+        RuleFor(x => x.Cantidad).GreaterThan(0);
+        RuleFor(x => x.TipoMovimiento).Must(t => TiposValidos.Contains(t.ToUpperInvariant()))
+            .WithMessage("TipoMovimiento debe ser ENTRADA, SALIDA o AJUSTE");
+        RuleFor(x => x.CostoUnitario).GreaterThanOrEqualTo(0).When(x => x.CostoUnitario.HasValue);
+    }
+}
+
+// ===== Fase 7: Equipos =====
+public sealed class CrearMaquinariaRequestValidator : AbstractValidator<CrearMaquinariaRequest>
+{
+    public CrearMaquinariaRequestValidator()
+    {
+        RuleFor(x => x.IdCentro).GreaterThan(0);
+        RuleFor(x => x.Codigo).NotEmpty().MaximumLength(20);
+        RuleFor(x => x.Nombre).NotEmpty().MaximumLength(100);
+        RuleFor(x => x.Anio).InclusiveBetween(1900, DateTime.UtcNow.Year + 1).When(x => x.Anio.HasValue);
+        RuleFor(x => x.ValorCompra).GreaterThanOrEqualTo(0).When(x => x.ValorCompra.HasValue);
+    }
+}
+
+public sealed class RegistrarMantenimientoRequestValidator : AbstractValidator<RegistrarMantenimientoRequest>
+{
+    private static readonly string[] TiposValidos = ["PREVENTIVO", "CORRECTIVO", "PREDICTIVO"];
+    public RegistrarMantenimientoRequestValidator()
+    {
+        RuleFor(x => x.IdMaquinaria).GreaterThan(0);
+        RuleFor(x => x.Descripcion).NotEmpty().MaximumLength(500);
+        RuleFor(x => x.TipoMantenimiento).Must(t => TiposValidos.Contains(t.ToUpperInvariant()))
+            .WithMessage("TipoMantenimiento debe ser PREVENTIVO, CORRECTIVO o PREDICTIVO");
+        RuleFor(x => x.CostoManoObra).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.CostoRepuestos).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.ProximoMantenimiento).GreaterThanOrEqualTo(x => x.Fecha)
+            .When(x => x.ProximoMantenimiento.HasValue)
+            .WithMessage("Próximo mantenimiento no puede ser anterior a la fecha");
+    }
+}
+
+// ===== Fase 7: Trazabilidad =====
+public sealed class EmitirRegistroICARequestValidator : AbstractValidator<EmitirRegistroICARequest>
+{
+    public EmitirRegistroICARequestValidator()
+    {
+        RuleFor(x => x.IdAnimal).GreaterThan(0);
+        RuleFor(x => x.TipoDocumento).NotEmpty().MaximumLength(50);
+        RuleFor(x => x.NumeroDocumento).NotEmpty().MaximumLength(50);
+        RuleFor(x => x.FechaVencimiento).GreaterThanOrEqualTo(x => x.FechaExpedicion)
+            .When(x => x.FechaVencimiento.HasValue)
+            .WithMessage("Vencimiento no puede ser anterior a expedición");
+    }
+}
+
+// ===== Fase 8: Nómina =====
+public sealed class ContratarTrabajadorRequestValidator : AbstractValidator<ContratarTrabajadorRequest>
+{
+    public ContratarTrabajadorRequestValidator()
+    {
+        RuleFor(x => x.Cedula).NotEmpty().MaximumLength(20);
+        RuleFor(x => x.Nombres).NotEmpty().MaximumLength(80);
+        RuleFor(x => x.Apellidos).NotEmpty().MaximumLength(80);
+        RuleFor(x => x.SalarioBase).GreaterThanOrEqualTo(0).When(x => x.SalarioBase.HasValue);
+        RuleFor(x => x.FechaIngreso).LessThanOrEqualTo(DateOnly.FromDateTime(DateTime.UtcNow))
+            .WithMessage("Fecha de ingreso no puede ser futura");
+    }
+}
+
+public sealed class RegistrarPagoJornalRequestValidator : AbstractValidator<RegistrarPagoJornalRequest>
+{
+    public RegistrarPagoJornalRequestValidator()
+    {
+        RuleFor(x => x.IdTrabajador).GreaterThan(0);
+        RuleFor(x => x.ValorJornal).GreaterThan(0);
+        RuleFor(x => x.HorasTrabajadas).GreaterThanOrEqualTo(0).When(x => x.HorasTrabajadas.HasValue);
+    }
+}
+
+// ===== Fase 8: Sostenibilidad =====
+public sealed class RegistrarCapturaCarbonoRequestValidator : AbstractValidator<RegistrarCapturaCarbonoRequest>
+{
+    public RegistrarCapturaCarbonoRequestValidator()
+    {
+        RuleFor(x => x.IdFinca).GreaterThan(0);
+        RuleFor(x => x.Anio).GreaterThanOrEqualTo(1900);
+        RuleFor(x => x.Mes).InclusiveBetween(1, 12).WithMessage("Mes debe ser 1..12");
+        RuleFor(x => x.EmisionesGanadoTCO2).GreaterThanOrEqualTo(0).When(x => x.EmisionesGanadoTCO2.HasValue);
+        RuleFor(x => x.CapturaForestal).GreaterThanOrEqualTo(0).When(x => x.CapturaForestal.HasValue);
+    }
+}
+
+public sealed class RegistrarConsumoAguaRequestValidator : AbstractValidator<RegistrarConsumoAguaRequest>
+{
+    public RegistrarConsumoAguaRequestValidator()
+    {
+        RuleFor(x => x.IdFinca).GreaterThan(0);
+        RuleFor(x => x.VolumenM3).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.NumAnimales).GreaterThanOrEqualTo(0).When(x => x.NumAnimales.HasValue);
+    }
+}
+
+public sealed class RegistrarEventoMedioambientalRequestValidator : AbstractValidator<RegistrarEventoMedioambientalRequest>
+{
+    public RegistrarEventoMedioambientalRequestValidator()
+    {
+        RuleFor(x => x.IdFinca).GreaterThan(0);
+        RuleFor(x => x.TipoEvento).NotEmpty().MaximumLength(80);
+        RuleFor(x => x.PrecipitacionMM).GreaterThanOrEqualTo(0).When(x => x.PrecipitacionMM.HasValue);
+        RuleFor(x => x).Must(x => !x.TempMaxC.HasValue || !x.TempMinC.HasValue || x.TempMaxC >= x.TempMinC)
+            .WithMessage("TempMax no puede ser menor que TempMin");
+    }
+}

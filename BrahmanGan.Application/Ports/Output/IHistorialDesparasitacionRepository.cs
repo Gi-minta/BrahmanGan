@@ -3,4 +3,7 @@ using BrahmanGan.Domain.Modulos.Sanidad;
 
 namespace BrahmanGan.Application.Ports.Output;
 
-public interface IHistorialDesparasitacionRepository : IRepository<HistorialDesparasitacion, HistorialDesparasitacionId> { }
+public interface IHistorialDesparasitacionRepository : IRepository<HistorialDesparasitacion, HistorialDesparasitacionId>
+{
+    Task<IReadOnlyList<HistorialDesparasitacion>> ListByAnimalAsync(AnimalId idAnimal, CancellationToken ct = default);
+}

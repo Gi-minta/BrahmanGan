@@ -47,6 +47,11 @@ internal class RolConfig : IEntityTypeConfiguration<Rol>
             .ValueGeneratedOnAdd();
 
         // Seed roles de sistema
+        b.HasMany(r => r.UsuariosRol)
+            .WithOne(ur => ur.Rol)
+            .HasForeignKey(ur => ur.RolId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         // ✅ No incluir Version ni CreatedAt: usan HasDefaultValue
         b.HasData(
             new { Id = RolId.From(1), Nombre = "Administrador", Descripcion = "Acceso total al sistema", EsSistema = true, Activo = true },

@@ -44,9 +44,9 @@ public class UsuarioConfig : IEntityTypeConfiguration<Usuario>
         builder.Property(u => u.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
 
         // Relaciones
-        builder.HasMany(typeof(UsuarioRol), "_usuariosRol")
-            .WithOne("Usuario")
-            .HasForeignKey("UsuarioId")
+        builder.HasMany(u => u.UsuariosRol)
+            .WithOne(ur => ur.Usuario)
+            .HasForeignKey(ur => ur.UsuarioId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

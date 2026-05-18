@@ -1,0 +1,5 @@
+CodigoCentroCosto|Codigo|Nombre|Marca|Modelo|Anio|NumeroSerie|FechaCompra|ValorCompra
+CC-ESP-01|MAQ-001|Tractor Agrícola|New Holland|T4.55|2018|NHT-2018-00123|2018-06-15|85000000
+CC-ESP-01|MAQ-002|Báscula Ganadera Electrónica|TRU-TEST|XR3000|2020|TT-2020-34567|2020-03-10|4500000
+CC-PAR-01|MAQ-003|Ordeñadora 2 Puestos|DeLaval|ML100|2021|DL-2021-78901|2021-09-20|12000000
+CC-PAR-01|MAQ-004|Picadora de Pasto|Meprozoo|PP-150|2022|MP-2022-45678|2022-04-05|8500000

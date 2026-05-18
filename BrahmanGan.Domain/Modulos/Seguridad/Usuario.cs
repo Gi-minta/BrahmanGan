@@ -68,7 +68,7 @@ public sealed class Usuario : AggregateRoot<UsuarioId>
     public void AsignarRol(Rol rol)
     {
         if (_usuariosRol.Any(ur => ur.RolId == rol.Id)) return;
-        _usuariosRol.Add(new UsuarioRol(this.Id, rol.Id));
+        _usuariosRol.Add(UsuarioRol.Crear(this.Id, rol.Id));
     }
 
     public void RevocarRol(RolId rolId)

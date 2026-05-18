@@ -1,0 +1,6 @@
+Codigo|Nombre|Tipo|UnidadMedida|PrecioUnitario|StockMinimo|StockInicial
+INS-001|Concentrado Bovino Crecimiento 18%|ALIMENTO|kg|1850|200|800
+INS-002|Sal mineralizada|SUPLEMENTO|kg|3200|50|300
+INS-003|Glifosato 480 SL|HERBICIDA|litro|28000|5|20
+INS-004|Abono Triple 15-15-15|FERTILIZANTE|kg|2200|100|400
+INS-005|Alambre de púas galvanizado|INSUMO_FINCA|rollo|85000|10|25

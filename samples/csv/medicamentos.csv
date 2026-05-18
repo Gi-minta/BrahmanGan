@@ -1,0 +1,6 @@
+Codigo|Nombre|Principio|TipoUso|Unidad|PrecioUnitario|TiempoCarne|TiempoLeche
+VAC-001|Vacuna Triple Bovina|Carbunco sintomático, Edema maligno, Septicemia|VACUNA|ml|12500|0|0
+VAC-002|Vacuna Aftosa|Virus aftosa tipos O A C|VACUNA|ml|9800|0|0
+ANT-001|Ivermectina 1%|Ivermectina|ANTIPARASITARIO|ml|8500|45|28
+ANT-002|Albendazol 10%|Albendazol|ANTIPARASITARIO|ml|6200|14|7
+ATB-001|Oxitetraciclina LA|Oxitetraciclina|ANTIBIOTICO|ml|15000|21|14
