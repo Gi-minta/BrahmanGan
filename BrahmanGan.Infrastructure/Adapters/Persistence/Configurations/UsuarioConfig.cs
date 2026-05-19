@@ -43,6 +43,8 @@ public class UsuarioConfig : IEntityTypeConfiguration<Usuario>
 
         builder.Property(u => u.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
 
+        builder.HasIndex(u => u.Email).IsUnique();
+
         // Relaciones
         builder.HasMany(u => u.UsuariosRol)
             .WithOne(ur => ur.Usuario)

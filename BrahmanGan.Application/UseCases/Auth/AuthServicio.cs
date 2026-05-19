@@ -32,14 +32,11 @@ public sealed class AuthServicio : IAuthServicio
     // ─── Login local ─────────────────────────────────────────
     public async Task<TokenResponse> LoginAsync(LoginRequest request, CancellationToken ct = default)
     {
-        var usuarioBase = await _usuarios.ObtenerPorEmailAsync(request.Email, ct)
+        var usuario = await _usuarios.ObtenerConRolesPorEmailAsync(request.Email, ct)
             ?? throw new AppEntityNotFoundException("Usuario", request.Email);
 
-        if (!usuarioBase.Activo)
+        if (!usuario.Activo)
             throw new BusinessRuleException("La cuenta está desactivada.");
-
-        var usuario = await _usuarios.ObtenerConRolesAsync(usuarioBase.Id, ct)
-            ?? throw new AppEntityNotFoundException("Usuario", usuarioBase.Id.Value);
 
         if (usuario.PasswordHash is null ||
             !_hasher.Verificar(request.Password, usuario.PasswordHash))

@@ -34,7 +34,7 @@ public sealed class MedicamentoService : IMedicamentoService
 
     public async Task<ControlPreventivoResponse> CrearControlAsync(CrearControlPreventivoRequest req, CancellationToken ct = default)
     {
-        var c = ControlPreventivo.Crear(req.Codigo, req.Nombre, req.Descripcion, req.FrecuenciaDias);
+        var c = ControlPreventivo.Crear(req.Nombre, req.Periodicidad, req.Descripcion);
         await _controlRepo.AddAsync(c, ct);
         await _uow.SaveChangesAsync(ct);
         return c.ToDto();

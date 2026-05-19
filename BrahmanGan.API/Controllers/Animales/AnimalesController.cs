@@ -46,4 +46,23 @@ public class AnimalesController : ControllerBase
         await _svc.TrasladarAsync(id, req, ct);
         return NoContent();
     }
+
+    [HttpGet("{id:int}/historial")]
+    public async Task<ActionResult<IReadOnlyList<HistorialAnimalResponse>>> Historial(int id, CancellationToken ct)
+        => Ok(await _svc.ListarHistorialAsync(id, ct));
+
+    [HttpGet("{id:int}/movimientos")]
+    public async Task<ActionResult<IReadOnlyList<MovimientoAnimalResponse>>> Movimientos(int id, CancellationToken ct)
+        => Ok(await _svc.ListarMovimientosAsync(id, ct));
+
+    [HttpPost("pedigri")]
+    public async Task<ActionResult<PedigriResponse>> CrearPedigri([FromBody] CrearPedigriRequest req, CancellationToken ct)
+        => Ok(await _svc.CrearPedigriAsync(req, ct));
+
+    [HttpGet("{id:int}/pedigri")]
+    public async Task<ActionResult<PedigriResponse>> ObtenerPedigri(int id, CancellationToken ct)
+    {
+        var r = await _svc.ObtenerPedigriAsync(id, ct);
+        return r is null ? NotFound() : Ok(r);
+    }
 }

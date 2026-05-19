@@ -14,4 +14,6 @@ public interface IUsuarioRepository
     Task ActualizarAsync(Usuario usuario, CancellationToken ct = default);
     /// <summary>Carga un usuario con sus roles y permisos.</summary>
     Task<Usuario?> ObtenerConRolesAsync(UsuarioId id, CancellationToken ct = default);
+    /// <summary>Carga un usuario por email junto con roles y permisos en una sola consulta dividida.</summary>
+    Task<Usuario?> ObtenerConRolesPorEmailAsync(string email, CancellationToken ct = default);
 }

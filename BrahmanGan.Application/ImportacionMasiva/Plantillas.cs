@@ -27,6 +27,20 @@ public static class Plantillas
         ["registros-ica"]           = "CodigoAnimal|TipoDocumento|NumeroDocumento|FechaExpedicion|FechaVencimiento|EntidadEmisora|Observaciones",
         ["captura-carbono"]         = "NombreFinca|Anio|Mes|EmisionesGanadoTCO2|CapturaForestal|Certificacion|Observaciones",
         ["consumo-agua"]            = "NombreFinca|Fecha|VolumenM3|FuenteAgua|NumAnimales|Observaciones",
+        // Alimentación
+        ["planes-alimentacion"]     = "NombreFinca|NombrePlan|FechaInicio|FechaFin|Observaciones",
+        ["detalles-alimentacion"]   = "IdPlan|Alimento|CantidadDiaria|UnidadMedida|IdInsumo|Observaciones",
+        // Pastoreo
+        ["planes-pastoreo"]         = "NombreFinca|CodigoPotrero|FechaInicio|FechaFin|NumAnimales|CapacidadCarga|Observaciones",
+        // Sanidad
+        ["complementos"]            = "IdTratamiento|Fecha|Descripcion|Tipo|Costo",
+        ["desparasitaciones"]       = "CodigoAnimal|CodigoMedicamento|Fecha|Dosis|TipoParasito|ProximaFecha",
+        ["aplicar-controles"]       = "CodigoAnimal|NombreControl|Fecha|CodigoMedicamento|Dosis|Responsable|ProximaFecha",
+        // Leche
+        ["lactancias"]              = "CodigoAnimal|NumeroParto|FechaInicio",
+        ["calidad-leche"]           = "Fecha|CodigoAnimal|CelSomaticas|GrasaPct|ProteinaPct|LactozaPct|UreaMgDL|Laboratorio|Resultado|Observaciones",
+        // Reproducción
+        ["semen"]                   = "Codigo|NombreToro|NombreRaza|Casa|StockInicial",
     };
 
     public static IReadOnlyCollection<string> Modulos => _headers.Keys;

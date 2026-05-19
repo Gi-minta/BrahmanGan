@@ -81,3 +81,80 @@ export type ImportResult = {
   fallidos: number;
   errores: ImportError[];
 };
+
+// ===== Alimentación =====
+export type PlanAlimentacion = {
+  id: number; idFinca: number; nombre: string;
+  fechaInicio: string; fechaFin?: string; observaciones?: string; activo: boolean;
+};
+export type DetallePlanAlimentacion = {
+  id: number; idPlan: number; alimento: string;
+  cantidadDiaria: number; unidadMedida: string; idInsumo?: number; observaciones?: string;
+};
+
+// ===== Pastoreo =====
+export type PlanPastoreo = {
+  id: number; idPotrero: number; fechaInicio: string; fechaFin?: string;
+  numAnimales?: number; capacidadCarga?: number; observaciones?: string; activo: boolean;
+};
+
+// ===== Sanidad extendida =====
+export type Desparasitacion = {
+  id: number; idAnimal: number; idMedicamento: number; fecha: string;
+  dosis?: number; tipoParasito?: string; proximaFecha?: string;
+};
+export type ControlPreventivo = { id: number; nombre: string; periodicidad?: string; descripcion?: string };
+export type HistorialPreventivo = {
+  id: number; idAnimal: number; idControl: number; fecha: string;
+  idMedicamento?: number; dosis?: number; responsable?: string; proximaFecha?: string;
+};
+export type Complemento = {
+  id: number; idTratamiento: number; fecha: string;
+  descripcion: string; tipo?: string; costo?: number;
+};
+
+// ===== Reproducción extendida =====
+export type Semen = {
+  id: number; codigo: string; nombreToro: string;
+  idRaza?: number; casa?: string; stockDosis: number; activo: boolean;
+};
+export type Nacimiento = {
+  id: number; idGestacion: number; idAnimalCria?: number; fecha: string;
+  sexo?: string; pesoNacimiento?: number; condicion?: string; observaciones?: string;
+};
+
+// ===== Leche extendida =====
+export type ParametroLactancia = {
+  id: number; idAnimal: number; numeroParto: number;
+  fechaInicio: string; fechaFin?: string; litrosTotales?: number;
+};
+export type CalidadLeche = {
+  id: number; idAnimal?: number; fecha: string;
+  celSomaticas?: number; grasaPct?: number; proteinaPct?: number;
+  lactozaPct?: number; ureaMgDL?: number; laboratorio?: string; resultado?: string; observaciones?: string;
+};
+
+// ===== Finca extendida =====
+export type GrupoManejo = { id: number; codigo: string; nombre: string; descripcion?: string; tipoAnimal?: string; activo: boolean };
+export type AnimalPotrero = {
+  id: number; idAnimal: number; idPotrero: number;
+  fechaIngreso: string; fechaSalida?: string; idGrupo?: number; vigente: boolean;
+};
+export type AcumulacionInsumoPotrero = {
+  id: number; idPotrero: number; idInsumo: number; fecha: string;
+  cantidad: number; costoUnitario?: number;
+};
+
+// ===== Inventario extendida =====
+export type HistorialAnimal = {
+  id: number; idAnimal: number; tipoEvento: string; fecha: string;
+  descripcion?: string; valor?: number; usuarioRegistro?: string; fechaRegistro: string;
+};
+export type MovimientoAnimal = {
+  id: number; idAnimal: number; tipoMovimiento: string; fecha: string;
+  valor?: number; idCentro?: number; pesoKg?: number; observaciones?: string;
+};
+export type Pedigri = {
+  id: number; idAnimal: number; idAbuelo1?: number; idAbuela1?: number;
+  idAbuelo2?: number; idAbuela2?: number; puntajeMorfologia?: number; observaciones?: string;
+};

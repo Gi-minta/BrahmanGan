@@ -23,6 +23,8 @@ const NAV: NavEntry[] = [
   {
     icon: '🌿', label: 'Finca', children: [
       { icon: '🌿', label: 'Finca & Potreros', to: '/finca' },
+      { icon: '🌾', label: 'Alimentación',     to: '/alimentacion' },
+      { icon: '🔄', label: 'Pastoreo',         to: '/pastoreo' },
     ],
   },
 

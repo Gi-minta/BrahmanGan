@@ -43,9 +43,19 @@ public sealed class UsuarioRepository : IUsuarioRepository
 
     public async Task<Usuario?> ObtenerConRolesAsync(UsuarioId id, CancellationToken ct = default) =>
         await _db.Usuarios
+            .AsSplitQuery()
             .Include(u => u.UsuariosRol)
                 .ThenInclude(ur => ur.Rol)
                     .ThenInclude(r => r!.RolesPermiso)
                         .ThenInclude(rp => rp.Permiso)
             .FirstOrDefaultAsync(u => u.Id == id, ct);
+
+    public async Task<Usuario?> ObtenerConRolesPorEmailAsync(string email, CancellationToken ct = default) =>
+        await _db.Usuarios
+            .AsSplitQuery()
+            .Include(u => u.UsuariosRol)
+                .ThenInclude(ur => ur.Rol)
+                    .ThenInclude(r => r!.RolesPermiso)
+                        .ThenInclude(rp => rp.Permiso)
+            .FirstOrDefaultAsync(u => u.Email == email.ToLowerInvariant().Trim(), ct);
 }

@@ -37,6 +37,7 @@ public static class DependencyInjection
         // Fase 4
         services.AddScoped<IMedicamentoService, MedicamentoService>();
         services.AddScoped<IVacunacionService, VacunacionService>();
+        services.AddScoped<IComplementoService, ComplementoService>();
         // Fase 5
         services.AddScoped<IControlLecheService, ControlLecheService>();
         services.AddScoped<IProduccionLecheService, ProduccionLecheService>();
@@ -93,6 +94,15 @@ public static class DependencyInjection
         services.AddScoped<ImportRegistrosICAService>();
         services.AddScoped<ImportCapturaCarbonoService>();
         services.AddScoped<ImportConsumoAguaService>();
+        services.AddScoped<ImportPlanesAlimentacionService>();
+        services.AddScoped<ImportDetallesAlimentacionService>();
+        services.AddScoped<ImportPlanesPastoreoService>();
+        services.AddScoped<ImportComplementosService>();
+        services.AddScoped<ImportDesparasitacionesService>();
+        services.AddScoped<ImportControlesPreventivosService>();
+        services.AddScoped<ImportLactanciasService>();
+        services.AddScoped<ImportCalidadLecheService>();
+        services.AddScoped<ImportSemenService>();
 
         return services;
     }

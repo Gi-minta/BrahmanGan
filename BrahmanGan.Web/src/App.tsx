@@ -22,6 +22,8 @@ import SostenibilidadPage from './pages/Sostenibilidad';
 import ReportesPage         from './pages/Reportes';
 import SeguridadPage         from './pages/Seguridad';
 import ImportacionMasivaPage from './pages/ImportacionMasiva';
+import AlimentacionPage       from './pages/Alimentacion';
+import PastoreoPage           from './pages/Pastoreo';
 
 /**
  * Árbol de rutas de BrahmanGan ERP.
@@ -72,6 +74,8 @@ export default function App() {
             <Route path="sostenibilidad" element={<SostenibilidadPage />} />
             <Route path="reportes"         element={<ReportesPage />} />
             <Route path="importacion"      element={<ImportacionMasivaPage />} />
+            <Route path="alimentacion"     element={<AlimentacionPage />} />
+            <Route path="pastoreo"         element={<PastoreoPage />} />
 
             {/* Solo Administradores */}
             <Route element={<ProtectedRoute rol="Administrador" />}>

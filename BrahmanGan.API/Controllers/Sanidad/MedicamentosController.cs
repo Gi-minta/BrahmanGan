@@ -16,4 +16,20 @@ public class MedicamentosController : ControllerBase
 
     [HttpGet] public async Task<ActionResult<IReadOnlyList<MedicamentoResponse>>> Listar(CancellationToken ct)
         => Ok(await _svc.ListarAsync(ct));
+
+    [HttpPost("controles")]
+    public async Task<ActionResult<ControlPreventivoResponse>> CrearControl([FromBody] CrearControlPreventivoRequest req, CancellationToken ct)
+        => Ok(await _svc.CrearControlAsync(req, ct));
+
+    [HttpGet("controles")]
+    public async Task<ActionResult<IReadOnlyList<ControlPreventivoResponse>>> ListarControles(CancellationToken ct)
+        => Ok(await _svc.ListarControlesAsync(ct));
+
+    [HttpPost("controles/aplicar")]
+    public async Task<ActionResult<HistorialPreventivoResponse>> AplicarControl([FromBody] AplicarControlPreventivoRequest req, CancellationToken ct)
+        => Ok(await _svc.AplicarControlAsync(req, ct));
+
+    [HttpGet("controles/historial/{idAnimal:int}")]
+    public async Task<ActionResult<IReadOnlyList<HistorialPreventivoResponse>>> HistorialPreventivo(int idAnimal, CancellationToken ct)
+        => Ok(await _svc.ListarHistorialPreventivoAsync(idAnimal, ct));
 }

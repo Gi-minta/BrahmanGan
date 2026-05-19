@@ -1,0 +1,7 @@
+CodigoAnimal|CodigoMedicamento|Fecha|Dosis|TipoParasito|ProximaFecha
+BOV-001|ANT-001|2025-01-15|8.0|Externo e interno|2025-04-15
+BOV-002|ANT-001|2025-01-15|7.5|Externo e interno|2025-04-15
+BOV-003|ANT-002|2025-01-16|10.0|Interno (helmintos)|2025-04-16
+BOV-004|ANT-001|2025-01-16|7.0|Externo e interno|2025-04-16
+BOV-005|ANT-002|2025-01-17|12.0|Interno (helmintos)|2025-04-17
+BOV-006|ANT-001|2025-01-17|6.5|Externo e interno|2025-04-17

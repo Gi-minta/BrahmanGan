@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(Get-ChildItem \"c:\\\\Users\\\\ger-8\\\\source\\\\repos\\\\PROYECTOS 2026 .NET\\\\GanaDat\\\\ganadero\\\\BrahmanGan\\\\src\\\\BrahmanGan.Web\\\\src\" -Recurse -Name | Where-Object { $_ -notmatch \"node_modules\" } | Sort-Object)"
+      "PowerShell(Get-ChildItem \"c:\\\\Users\\\\ger-8\\\\source\\\\repos\\\\PROYECTOS 2026 .NET\\\\GanaDat\\\\ganadero\\\\BrahmanGan\\\\src\\\\BrahmanGan.Web\\\\src\" -Recurse -Name | Where-Object { $_ -notmatch \"node_modules\" } | Sort-Object)",
+      "Bash(dotnet ef *)",
+      "Bash(Select-String -Path \"c:\\\\Users\\\\ger-8\\\\source\\\\repos\\\\PROYECTOS 2026 .NET\\\\GanaDat\\\\ganadero\\\\BrahmanGan\\\\src\\\\BrahmanGan.Infrastructure\\\\Adapters\\\\Persistence\\\\Migrations\\\\ApplicationDbContextModelSnapshot.cs\" -Pattern \"IX_UsuariosRoles_RolId\")",
+      "Bash(Select-Object -First 5)"
     ]
   }
 }

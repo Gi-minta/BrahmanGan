@@ -22,7 +22,8 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString,
-                b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
+                b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)
+                      .CommandTimeout(60)));
 
         var eventStoreConnectionString = configuration.GetConnectionString("EventStoreConnection") ?? connectionString;
         services.AddDbContext<EventStoreDbContext>(options =>
@@ -40,6 +41,7 @@ public static class DependencyInjection
         services.AddScoped<IRazaRepository, RazaRepository>();
         services.AddScoped<IOrigenRepository, OrigenRepository>();
         services.AddScoped<IHistorialAnimalRepository, HistorialAnimalRepository>();
+        services.AddScoped<IMovimientoAnimalRepository, MovimientoAnimalRepository>();
         services.AddScoped<IPesajeRepository, PesajeRepository>();
         services.AddScoped<IMarcacionRepository, MarcacionRepository>();
         // Fase 2
@@ -53,6 +55,7 @@ public static class DependencyInjection
         services.AddScoped<IAnimalPotreroRepository, AnimalPotreroRepository>();
         // Fase 3
         services.AddScoped<ISemenRepository, SemenRepository>();
+        services.AddScoped<IPedigriRepository, PedigriRepository>();
         services.AddScoped<IServicioRepository, ServicioRepository>();
         services.AddScoped<IGestacionRepository, GestacionRepository>();
         services.AddScoped<INacimientoRepository, NacimientoRepository>();
@@ -64,6 +67,7 @@ public static class DependencyInjection
         services.AddScoped<IHistorialDesparasitacionRepository, HistorialDesparasitacionRepository>();
         services.AddScoped<IHistorialCurativoRepository, HistorialCurativoRepository>();
         services.AddScoped<IHistorialMastitisRepository, HistorialMastitisRepository>();
+        services.AddScoped<IComplementoRepository, ComplementoRepository>();
         // Fase 5
         services.AddScoped<IControlLecheAnimalRepository, ControlLecheAnimalRepository>();
         services.AddScoped<IProduccionLecheRepository, ProduccionLecheRepository>();
@@ -87,6 +91,7 @@ public static class DependencyInjection
         services.AddScoped<IIngresoRepository, IngresoRepository>();
         services.AddScoped<IInsumoRepository, InsumoRepository>();
         services.AddScoped<IKardexInsumoRepository, KardexInsumoRepository>();
+        services.AddScoped<IAcumulacionInsumoPotreroRepository, AcumulacionInsumoPotreroRepository>();
         services.AddScoped<IMaquinariaRepository, MaquinariaRepository>();
         services.AddScoped<IMantenimientoEquipoRepository, MantenimientoEquipoRepository>();
         services.AddScoped<IRegistroICARepository, RegistroICARepository>();

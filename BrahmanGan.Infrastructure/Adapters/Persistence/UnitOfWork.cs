@@ -24,10 +24,20 @@ public class UnitOfWork : IUnitOfWork
     public async Task<int> SaveChangesAsync(CancellationToken ct = default)
     {
         var events = ExtraerEventosDeDominio();
-        var result = await _context.SaveChangesAsync(ct);
-        if (events.Count > 0)
-            await _dispatcher.DispatchAsync(events, ct);
-        return result;
+        try
+        {
+            var result = await _context.SaveChangesAsync(ct);
+            if (events.Count > 0)
+                await _dispatcher.DispatchAsync(events, ct);
+            return result;
+        }
+        finally
+        {
+            // Always clear so consecutive operations with transient keys (RazaId(0),
+            // AnimalId(0), etc.) don't collide, including when SaveChanges throws
+            // (e.g. unique-constraint violation during bulk import).
+            _context.ChangeTracker.Clear();
+        }
     }
 
     private List<IDomainEvent> ExtraerEventosDeDominio()

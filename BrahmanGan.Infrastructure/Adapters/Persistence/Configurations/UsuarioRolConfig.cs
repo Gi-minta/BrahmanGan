@@ -32,5 +32,6 @@ public class UsuarioRolConfig : IEntityTypeConfiguration<UsuarioRol>
                 id => id.Value,
                 v => RolId.From(v));
 
+        builder.HasIndex(ur => ur.RolId);
     }
 }

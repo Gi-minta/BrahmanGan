@@ -183,6 +183,74 @@ public class ImportacionMasivaController : ControllerBase
         CancellationToken ct)
         => Ejecutar(archivo, svc.ImportarAsync, ct);
 
+    // ── Alimentación ───────────────────────────────────────────────
+    [HttpPost("planes-alimentacion")]
+    public Task<ActionResult<ImportResult>> ImportarPlanesAlimentacion(
+        IFormFile archivo,
+        [FromServices] ImportPlanesAlimentacionService svc,
+        CancellationToken ct)
+        => Ejecutar(archivo, svc.ImportarAsync, ct);
+
+    [HttpPost("detalles-alimentacion")]
+    public Task<ActionResult<ImportResult>> ImportarDetallesAlimentacion(
+        IFormFile archivo,
+        [FromServices] ImportDetallesAlimentacionService svc,
+        CancellationToken ct)
+        => Ejecutar(archivo, svc.ImportarAsync, ct);
+
+    // ── Pastoreo ───────────────────────────────────────────────────
+    [HttpPost("planes-pastoreo")]
+    public Task<ActionResult<ImportResult>> ImportarPlanesPastoreo(
+        IFormFile archivo,
+        [FromServices] ImportPlanesPastoreoService svc,
+        CancellationToken ct)
+        => Ejecutar(archivo, svc.ImportarAsync, ct);
+
+    // ── Sanidad (nuevos) ───────────────────────────────────────────
+    [HttpPost("complementos")]
+    public Task<ActionResult<ImportResult>> ImportarComplementos(
+        IFormFile archivo,
+        [FromServices] ImportComplementosService svc,
+        CancellationToken ct)
+        => Ejecutar(archivo, svc.ImportarAsync, ct);
+
+    [HttpPost("desparasitaciones")]
+    public Task<ActionResult<ImportResult>> ImportarDesparasitaciones(
+        IFormFile archivo,
+        [FromServices] ImportDesparasitacionesService svc,
+        CancellationToken ct)
+        => Ejecutar(archivo, svc.ImportarAsync, ct);
+
+    [HttpPost("aplicar-controles")]
+    public Task<ActionResult<ImportResult>> ImportarControlesPreventivos(
+        IFormFile archivo,
+        [FromServices] ImportControlesPreventivosService svc,
+        CancellationToken ct)
+        => Ejecutar(archivo, svc.ImportarAsync, ct);
+
+    // ── Leche (nuevos) ─────────────────────────────────────────────
+    [HttpPost("lactancias")]
+    public Task<ActionResult<ImportResult>> ImportarLactancias(
+        IFormFile archivo,
+        [FromServices] ImportLactanciasService svc,
+        CancellationToken ct)
+        => Ejecutar(archivo, svc.ImportarAsync, ct);
+
+    [HttpPost("calidad-leche")]
+    public Task<ActionResult<ImportResult>> ImportarCalidadLeche(
+        IFormFile archivo,
+        [FromServices] ImportCalidadLecheService svc,
+        CancellationToken ct)
+        => Ejecutar(archivo, svc.ImportarAsync, ct);
+
+    // ── Reproducción (nuevos) ──────────────────────────────────────
+    [HttpPost("semen")]
+    public Task<ActionResult<ImportResult>> ImportarSemen(
+        IFormFile archivo,
+        [FromServices] ImportSemenService svc,
+        CancellationToken ct)
+        => Ejecutar(archivo, svc.ImportarAsync, ct);
+
     // ── Plantillas ─────────────────────────────────────────────────
     [HttpGet("plantilla/{modulo}")]
     public IActionResult DescargarPlantilla(string modulo)

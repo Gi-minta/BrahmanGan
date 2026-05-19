@@ -60,6 +60,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<HistorialCurativo> HistorialCurativo => Set<HistorialCurativo>();
     public DbSet<DetalleCurativo> DetallesCurativos => Set<DetalleCurativo>();
     public DbSet<HistorialMastitis> HistorialMastitis => Set<HistorialMastitis>();
+    public DbSet<Complemento> Complementos => Set<Complemento>();
 
     // ===== Fase 5: Producción de leche =====
     public DbSet<ParametroLactancia> ParametrosLactancia => Set<ParametroLactancia>();
@@ -125,6 +126,34 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        // EF Core uses null as the sentinel for reference-type keys, but every IntId
+        // subtype uses IntId(0) as "not yet assigned". This loop tells EF Core that
+        // XxxId(0) is the sentinel so it marks those entities as "needs generation"
+        // instead of treating 0 as an explicit key value. Without this, adding two
+        // new entities in a loop (import) causes a duplicate-key conflict in the
+        // identity map before SaveChanges is even called.
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var pk = entityType.FindPrimaryKey();
+            if (pk is not { Properties.Count: 1 }) continue;
+
+            var pkProp = pk.Properties[0];
+            if (!typeof(BrahmanGan.Domain.Common.IntId).IsAssignableFrom(pkProp.ClrType)) continue;
+
+            var fromMethod = pkProp.ClrType.GetMethod(
+                "From",
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static,
+                new[] { typeof(int) });
+
+            if (fromMethod == null) continue;
+
+            var sentinel = fromMethod.Invoke(null, new object[] { 0 });
+            modelBuilder.Entity(entityType.ClrType)
+                .Property(pkProp.Name)
+                .HasSentinel(sentinel);
+        }
+
         base.OnModelCreating(modelBuilder);
     }
 }

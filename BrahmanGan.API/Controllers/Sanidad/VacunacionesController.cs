@@ -21,4 +21,12 @@ public class VacunacionesController : ControllerBase
     [HttpGet("alertas")]
     public async Task<ActionResult<IReadOnlyList<VacunacionResponse>>> Alertas([FromQuery] int dias = 7, CancellationToken ct = default)
         => Ok(await _svc.ListarAlertasAsync(dias, ct));
+
+    [HttpPost("desparasitacion")]
+    public async Task<ActionResult<DesparasitacionResponse>> AplicarDesparasitacion([FromBody] AplicarDesparasitacionRequest req, CancellationToken ct)
+        => Ok(await _svc.AplicarDesparasitacionAsync(req, ct));
+
+    [HttpGet("desparasitacion/animal/{idAnimal:int}")]
+    public async Task<ActionResult<IReadOnlyList<DesparasitacionResponse>>> ListarDesparasitacion(int idAnimal, CancellationToken ct)
+        => Ok(await _svc.ListarDesparasitacionesPorAnimalAsync(idAnimal, ct));
 }

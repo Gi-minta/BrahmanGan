@@ -137,4 +137,51 @@ internal static class Mappers
     public static PlanPastoreoResponse ToDto(this PlanPastoreo p) =>
         new(p.Id.Value, p.IdPotrero.Value, p.FechaInicio, p.FechaFin,
             p.NumAnimales, p.CapacidadCarga, p.Observaciones, p.Activo);
+
+    // ===== Sanidad - Extendida =====
+    public static DesparasitacionResponse ToDto(this HistorialDesparasitacion d) =>
+        new(d.Id.Value, d.IdAnimal.Value, d.IdMedicamento.Value, d.Fecha, d.Dosis, d.TipoParasito, d.ProximaFecha);
+
+    public static ControlPreventivoResponse ToDto(this ControlPreventivo c) =>
+        new(c.Id.Value, c.Nombre, c.Periodicidad, c.Descripcion);
+
+    public static HistorialPreventivoResponse ToDto(this HistorialPreventivo h) =>
+        new(h.Id.Value, h.IdAnimal.Value, h.IdControl.Value, h.Fecha, h.IdMedicamento?.Value, h.Dosis, h.Responsable, h.ProximaFecha);
+
+    public static ComplementoResponse ToDto(this Complemento c) =>
+        new(c.Id.Value, c.IdTratamiento.Value, c.Fecha, c.Descripcion, c.Tipo, c.Costo);
+
+    // ===== Reproducción - Extendida =====
+    public static SemenResponse ToDto(this Semen s) =>
+        new(s.Id.Value, s.Codigo, s.NombreToro, s.IdRaza?.Value, s.Casa, s.StockDosis, s.Activo);
+
+    public static NacimientoResponse ToDto(this Nacimiento n) =>
+        new(n.Id.Value, n.IdGestacion.Value, n.IdAnimalCria?.Value, n.Fecha, n.Sexo?.ToString(), n.PesoNacimiento, n.Condicion, n.Observaciones);
+
+    // ===== Leche - Extendida =====
+    public static ParametroLactanciaResponse ToDto(this ParametroLactancia p) =>
+        new(p.Id.Value, p.IdAnimal.Value, p.NumeroParto, p.FechaInicio, p.FechaFin, p.LitrosTotales);
+
+    public static CalidadLecheResponse ToDto(this CalidadLeche c) =>
+        new(c.Id.Value, c.IdAnimal?.Value, c.Fecha, c.CelSomaticas, c.GrasaPct, c.ProteinaPct, c.LactozaPct, c.UreaMgDL, c.Laboratorio, c.Resultado, c.Observaciones);
+
+    // ===== Finca - Extendida =====
+    public static GrupoManejoResponse ToDto(this GrupoManejo g) =>
+        new(g.Id.Value, g.Codigo, g.Nombre, g.Descripcion, g.TipoAnimal, g.Activo);
+
+    public static AnimalPotreroResponse ToDto(this AnimalPotrero ap) =>
+        new(ap.Id.Value, ap.IdAnimal.Value, ap.IdPotrero.Value, ap.FechaIngreso, ap.FechaSalida, ap.IdGrupo?.Value, ap.EstaVigente());
+
+    public static AcumulacionInsumoPotreroResponse ToDto(this AcumulacionInsumoPotrero a) =>
+        new(a.Id.Value, a.IdPotrero.Value, a.IdInsumo.Value, a.Fecha, a.Cantidad, a.CostoUnitario);
+
+    // ===== Inventario - Extendida =====
+    public static HistorialAnimalResponse ToDto(this HistorialAnimal h) =>
+        new(h.Id.Value, h.IdAnimal.Value, h.TipoEvento.ToString(), h.Fecha, h.Descripcion, h.Valor, h.UsuarioRegistro, h.FechaRegistro);
+
+    public static MovimientoAnimalResponse ToDto(this MovimientoAnimal m) =>
+        new(m.Id.Value, m.IdAnimal.Value, m.TipoMovimiento.ToString(), m.Fecha, m.Valor, m.IdCentro, m.PesoKg, m.Observaciones);
+
+    public static PedigriResponse ToDto(this Pedigri p) =>
+        new(p.Id.Value, p.IdAnimal.Value, p.IdAbuelo1?.Value, p.IdAbuela1?.Value, p.IdAbuelo2?.Value, p.IdAbuela2?.Value, p.PuntajeMorfologia, p.Observaciones);
 }

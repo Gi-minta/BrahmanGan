@@ -1,0 +1,7 @@
+CodigoAnimal|NombreControl|Fecha|CodigoMedicamento|Dosis|Responsable|ProximaFecha
+BOV-001|Desparasitación Trimestral|2025-01-15|ANT-001|8.0|Carlos Pérez|2025-04-15
+BOV-002|Desparasitación Trimestral|2025-01-15|ANT-001|7.5|Carlos Pérez|2025-04-15
+BOV-003|Vitaminas Preventivas|2025-02-01||5.0|María González|2025-05-01
+BOV-004|Vitaminas Preventivas|2025-02-01||5.0|María González|2025-05-01
+BOV-005|Chequeo Reproductivo|2025-02-20|||Luisa Castaño|2025-08-20
+BOV-006|Desparasitación Trimestral|2025-01-17|ANT-002|6.0|Carlos Pérez|2025-04-17

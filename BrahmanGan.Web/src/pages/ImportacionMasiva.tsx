@@ -46,6 +46,20 @@ const MODULOS: Modulo[] = [
   // Sostenibilidad
   { id: 'captura-carbono',         label: 'Captura Carbono',         icon: '🌱', grupo: 'Sostenibilidad', descripcion: 'Capturas de CO₂ por finca' },
   { id: 'consumo-agua',            label: 'Consumo Agua',            icon: '💧', grupo: 'Sostenibilidad', descripcion: 'Consumo hídrico' },
+  // Alimentación
+  { id: 'planes-alimentacion',     label: 'Planes Alimentación',     icon: '🌾', grupo: 'Alimentación',   descripcion: 'Planes de alimentación por finca' },
+  { id: 'detalles-alimentacion',   label: 'Detalles Alimentación',   icon: '🥣', grupo: 'Alimentación',   descripcion: 'Detalles e insumos por plan' },
+  // Pastoreo
+  { id: 'planes-pastoreo',         label: 'Planes de Pastoreo',      icon: '🔄', grupo: 'Pastoreo',       descripcion: 'Rotación de potreros' },
+  // Sanidad (nuevos)
+  { id: 'complementos',            label: 'Complementos',            icon: '🩺', grupo: 'Sanidad',        descripcion: 'Complementos a tratamientos' },
+  { id: 'desparasitaciones',       label: 'Desparasitaciones',       icon: '🪱', grupo: 'Sanidad',        descripcion: 'Historial de desparasitación' },
+  { id: 'aplicar-controles',       label: 'Controles Preventivos',   icon: '🛡️', grupo: 'Sanidad',        descripcion: 'Aplicación de controles por animal' },
+  // Leche (nuevos)
+  { id: 'lactancias',              label: 'Lactancias',              icon: '🐄', grupo: 'Leche',          descripcion: 'Períodos de lactancia por animal' },
+  { id: 'calidad-leche',           label: 'Calidad de Leche',        icon: '🧪', grupo: 'Leche',          descripcion: 'Análisis de calidad (laboratorio)' },
+  // Reproducción (nuevos)
+  { id: 'semen',                   label: 'Inventario Semen',        icon: '🧬', grupo: 'Reproducción',   descripcion: 'Stock de pajillas por toro' },
 ];
 
 const GRUPOS = [...new Set(MODULOS.map(m => m.grupo))];
@@ -54,6 +68,7 @@ const GRUPO_ICON: Record<string, string> = {
   Inventario: '🐄', Finca: '🌿', Reproducción: '🔬', Sanidad: '💊',
   Leche: '🥛', Comercial: '🤝', Costos: '💰', Almacén: '📦',
   Equipos: '🚜', Nómina: '👷', Trazabilidad: '📋', Sostenibilidad: '🌱',
+  Alimentación: '🌾', Pastoreo: '🔄',
 };
 
 function fmtBytes(bytes: number) {
