@@ -39,60 +39,59 @@ export default function LoginPage() {
 
   async function handleGoogle() {
     setError('');
-    // Para producción, usa Google Identity Services:
-    // 1. Carga el script https://accounts.google.com/gsi/client
-    // 2. Llama a google.accounts.id.initialize con tu clientId
-    // 3. Recibe el credential (ID token) y envíalo a /api/auth/oauth/google
     setError('Configura Google OAuth2: agrega tu ClientId en appsettings.json y el script GIS en index.html.');
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-700 via-brand-600 to-brand-500 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-gradient-to-br from-brand-800 via-brand-700 to-brand-500">
+
+      {/* Decorative blobs */}
+      <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-white/5 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-[-15%] left-[-10%] w-[500px] h-[500px] rounded-full bg-brand-900/40 blur-3xl pointer-events-none" />
+
+      {/* Subtle grid overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        }}
+      />
+
+      <div className="w-full max-w-md relative z-10 animate-fade-in-up">
         {/* Logo / título */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-lg mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-white/15 backdrop-blur-sm rounded-2xl shadow-lg mb-4 border border-white/20">
             <span className="text-3xl">🐄</span>
           </div>
           <h1 className="text-3xl font-bold text-white tracking-tight">BrahmanGan</h1>
-          <p className="text-brand-100 text-sm mt-1">ERP Ganadero · Sistema de Gestión</p>
+          <p className="text-brand-200 text-sm mt-1 font-medium">ERP Ganadero · Sistema de Gestión</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-modal overflow-hidden border border-white/10">
           {/* Tabs */}
-          <div className="flex">
-            <button
-              onClick={() => { setTab('login'); setError(''); }}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors ${
-                tab === 'login'
-                  ? 'bg-brand-50 text-brand-700 border-b-2 border-brand-600'
-                  : 'text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              Iniciar sesión
-            </button>
-            <button
-              onClick={() => { setTab('registro'); setError(''); }}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors ${
-                tab === 'registro'
-                  ? 'bg-brand-50 text-brand-700 border-b-2 border-brand-600'
-                  : 'text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              Registrarse
-            </button>
+          <div className="flex bg-slate-50 border-b border-slate-100">
+            {(['login', 'registro'] as Tab[]).map(t => (
+              <button
+                key={t}
+                onClick={() => { setTab(t); setError(''); }}
+                className={`flex-1 py-3.5 text-sm font-semibold transition-all duration-150
+                  ${tab === t
+                    ? 'text-brand-700 border-b-2 border-brand-500 bg-white -mb-px'
+                    : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                {t === 'login' ? 'Iniciar sesión' : 'Registrarse'}
+              </button>
+            ))}
           </div>
 
           <form onSubmit={handleSubmit} className="p-8 space-y-4">
-            {/* Error */}
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">
+              <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm">
                 {error}
               </div>
             )}
 
-            {/* Nombre (solo registro) */}
             {tab === 'registro' && (
               <div>
                 <label className="label">Nombre completo</label>
@@ -107,7 +106,6 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Email */}
             <div>
               <label className="label">Correo electrónico</label>
               <input
@@ -121,7 +119,6 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Password */}
             <div>
               <label className="label">Contraseña</label>
               <input
@@ -136,7 +133,6 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Confirmar (solo registro) */}
             {tab === 'registro' && (
               <div>
                 <label className="label">Confirmar contraseña</label>
@@ -153,29 +149,33 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={cargando}
-              className="w-full py-2.5 bg-brand-600 text-white font-semibold rounded-lg hover:bg-brand-700 transition disabled:opacity-60 mt-2"
+              className="w-full py-3 bg-gradient-to-b from-brand-500 to-brand-700 text-white font-semibold rounded-xl shadow-md shadow-brand-600/30 hover:from-brand-600 hover:to-brand-800 hover:shadow-lg hover:shadow-brand-600/40 active:scale-[0.99] transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed mt-2"
             >
-              {cargando ? 'Procesando…' : tab === 'login' ? 'Ingresar' : 'Crear cuenta'}
+              {cargando ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Procesando…
+                </span>
+              ) : tab === 'login' ? 'Ingresar' : 'Crear cuenta'}
             </button>
 
-            {/* Divider */}
             <div className="flex items-center gap-3">
               <hr className="flex-1 border-slate-200" />
               <span className="text-slate-400 text-xs">o continúa con</span>
               <hr className="flex-1 border-slate-200" />
             </div>
 
-            {/* Google OAuth2 */}
             <button
               type="button"
               onClick={handleGoogle}
-              className="w-full flex items-center justify-center gap-3 py-2.5 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition"
+              className="w-full flex items-center justify-center gap-3 py-2.5 border border-slate-200 rounded-xl text-slate-700 font-medium hover:bg-slate-50 hover:border-slate-300 transition-all duration-150 shadow-sm"
             >
-              {/* Google "G" icon SVG */}
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -187,7 +187,7 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-brand-100 text-xs mt-6">
+        <p className="text-center text-white/50 text-xs mt-6 font-medium">
           © {new Date().getFullYear()} BrahmanGan · Todos los derechos reservados
         </p>
       </div>
