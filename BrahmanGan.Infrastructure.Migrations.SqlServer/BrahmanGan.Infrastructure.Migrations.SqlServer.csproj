@@ -11,12 +11,7 @@
     Las migraciones son específicas de cada proveedor y no son portables; por eso
     viven en su propio proyecto. El proveedor activo (Database:Provider) determina
     en runtime cuál se usa (ver DatabaseProviderResolver / MigrationsAssemblies).
-
-    Regenerar / añadir migraciones para SQL Server:
-      dotnet ef migrations add <Nombre> \
-        --project BrahmanGan.Infrastructure.Migrations.SqlServer \
-        --startup-project BrahmanGan.API
-      (con Database:Provider=SqlServer)
+    Para regenerar migraciones ver DATABASE_PROVIDERS.md.
   -->
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.7" />

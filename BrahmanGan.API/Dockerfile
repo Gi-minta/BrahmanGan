@@ -1,23 +1,27 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+# syntax=docker/dockerfile:1
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# ── Build ──────────────────────────────────────────────────────────────
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["src/BrahmanGan.API/BrahmanGan.API.csproj", "src/BrahmanGan.API/"]
-COPY ["src/BrahmanGan.Application/BrahmanGan.Application.csproj", "src/BrahmanGan.Application/"]
-COPY ["src/BrahmanGan.Domain/BrahmanGan.Domain.csproj", "src/BrahmanGan.Domain/"]
-COPY ["src/BrahmanGan.Infrastructure/BrahmanGan.Infrastructure.csproj", "src/BrahmanGan.Infrastructure/"]
-RUN dotnet restore "src/BrahmanGan.API/BrahmanGan.API.csproj"
+
+# Copia primero los .csproj para aprovechar la caché de restore.
+COPY BrahmanGan.API/BrahmanGan.API.csproj BrahmanGan.API/
+COPY BrahmanGan.Application/BrahmanGan.Application.csproj BrahmanGan.Application/
+COPY BrahmanGan.Domain/BrahmanGan.Domain.csproj BrahmanGan.Domain/
+COPY BrahmanGan.Infrastructure/BrahmanGan.Infrastructure.csproj BrahmanGan.Infrastructure/
+COPY BrahmanGan.Infrastructure.Migrations.SqlServer/BrahmanGan.Infrastructure.Migrations.SqlServer.csproj BrahmanGan.Infrastructure.Migrations.SqlServer/
+COPY BrahmanGan.Infrastructure.Migrations.Postgres/BrahmanGan.Infrastructure.Migrations.Postgres.csproj BrahmanGan.Infrastructure.Migrations.Postgres/
+RUN dotnet restore BrahmanGan.API/BrahmanGan.API.csproj
+
+# Copia el resto del código y publica.
 COPY . .
-WORKDIR "/src/src/BrahmanGan.API"
-RUN dotnet build "BrahmanGan.API.csproj" -c Release -o /app/build
+RUN dotnet publish BrahmanGan.API/BrahmanGan.API.csproj -c Release -o /app/publish /p:UseAppHost=false
 
-FROM build AS publish
-RUN dotnet publish "BrahmanGan.API.csproj" -c Release -o /app/publish
-
-FROM base AS final
+# ── Runtime ────────────────────────────────────────────────────────────
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+# Las imágenes .NET 10 escuchan en 8080 por defecto y corren como usuario no-root.
+ENV ASPNETCORE_HTTP_PORTS=8080
+EXPOSE 8080
+COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "BrahmanGan.API.dll"]

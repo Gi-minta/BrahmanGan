@@ -1,0 +1,47 @@
+# docker-compose para probar BrahmanGan con PostgreSQL.
+#
+#   docker compose up --build
+#
+# La API queda en http://localhost:8080 (Scalar UI: http://localhost:8080/scalar).
+# Al arrancar aplica automáticamente las migraciones de Postgres y siembra el usuario
+# admin por defecto (email admin@brahmangan.com; la contraseña por defecto se define en
+# DbInitializer y debe cambiarse tras el primer inicio de sesión).
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: brahmangan-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: BrahmanGanDb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d BrahmanGanDb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: BrahmanGan.API/Dockerfile
+    container_name: brahmangan-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      # Selecciona PostgreSQL (sobrescribe el appsettings, que trae SqlServer por defecto).
+      Database__Provider: Postgres
+      ConnectionStrings__DefaultConnection_Postgres: "Host=postgres;Port=5432;Database=BrahmanGanDb;Username=postgres;Password=postgres"
+      ConnectionStrings__EventStoreConnection_Postgres: "Host=postgres;Port=5432;Database=BrahmanGanDb;Username=postgres;Password=postgres"
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:

@@ -4,6 +4,29 @@ BrahmanGan soporta **dos proveedores de base de datos** de forma intercambiable 
 configuración: **SQL Server** (por defecto) y **PostgreSQL**. El modelo de datos es el mismo;
 solo cambian el proveedor EF Core, la cadena de conexión y el set de migraciones.
 
+## Probar con PostgreSQL rápidamente (Docker)
+
+Hay un `docker-compose.yml` en la raíz que levanta PostgreSQL + la API ya configurada:
+
+```bash
+docker compose up --build
+```
+
+La API queda en http://localhost:8080 (Scalar UI en `/scalar`). Al arrancar aplica las
+migraciones de Postgres y siembra el usuario admin por defecto (email
+`admin@brahmangan.com`; la contraseña por defecto se define en `DbInitializer` y debe
+cambiarse tras el primer inicio de sesión). Prueba el login:
+
+```bash
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"Email":"admin@brahmangan.com","Password":"<PASSWORD_ADMIN>"}'
+```
+
+Devuelve un JWT (`accessToken`). Nota: al usar la imagen slim de .NET puede aparecer un
+warning inofensivo de Npgsql (`libgssapi_krb5.so.2: cannot open shared object file`) al
+sondear autenticación Kerberos; la conexión por usuario/contraseña funciona igualmente.
+
 ## Cómo elegir el proveedor
 
 En `appsettings.json` (o por variable de entorno / secreto):
