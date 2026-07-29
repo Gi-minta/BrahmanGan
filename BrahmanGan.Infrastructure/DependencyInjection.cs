@@ -19,16 +19,21 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString,
-                b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)
-                      .CommandTimeout(60)));
+        // ===== Selección de proveedor de base de datos (SQL Server / PostgreSQL) =====
+        // El proveedor activo se elige por configuración (Database:Provider). Cada proveedor
+        // usa su propia cadena de conexión y su propio assembly de migraciones.
+        var provider = DatabaseProviderResolver.Resolve(configuration);
 
-        var eventStoreConnectionString = configuration.GetConnectionString("EventStoreConnection") ?? connectionString;
+        var connectionString = configuration.GetConnectionString(
+            DatabaseProviderResolver.ConnectionStringName("DefaultConnection", provider));
+        services.AddDbContext<ApplicationDbContext>(options =>
+            DatabaseProviderResolver.Configure(options, provider, connectionString));
+
+        var eventStoreConnectionString = configuration.GetConnectionString(
+            DatabaseProviderResolver.ConnectionStringName("EventStoreConnection", provider))
+            ?? connectionString;
         services.AddDbContext<EventStoreDbContext>(options =>
-            options.UseSqlServer(eventStoreConnectionString,
-                b => b.MigrationsAssembly(typeof(EventStoreDbContext).Assembly.FullName)));
+            DatabaseProviderResolver.Configure(options, provider, eventStoreConnectionString));
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IEventStore, EventStore>();

@@ -39,7 +39,7 @@ public class EventStoreDbContext : DbContext
 
             entity.Property(e => e.EventData)
                 .IsRequired()
-                .HasColumnType("nvarchar(max)");
+                .HasColumnType(Database.IsNpgsql() ? "text" : "nvarchar(max)");
 
             entity.Property(e => e.OccurredOn)
                 .IsRequired();
@@ -49,7 +49,7 @@ public class EventStoreDbContext : DbContext
 
             entity.Property(e => e.CreatedAt)
                 .IsRequired()
-                .HasDefaultValueSql("GETUTCDATE()");
+                .HasDefaultValueSql(Database.IsNpgsql() ? "now() at time zone 'utc'" : "GETUTCDATE()");
 
             // Índices para optimizar consultas
             entity.HasIndex(e => e.EventId).IsUnique();

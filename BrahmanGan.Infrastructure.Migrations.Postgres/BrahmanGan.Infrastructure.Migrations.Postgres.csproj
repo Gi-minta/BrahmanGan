@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!--
+    Assembly de migraciones EF Core para PostgreSQL.
+    Empieza vacío: el set de migraciones Postgres se genera con dotnet ef (requiere el
+    SDK de .NET 10 y una máquina con acceso a NuGet). El proveedor activo
+    (Database:Provider=Postgres) hace que en runtime se use este assembly.
+
+    Generar la migración inicial para Postgres:
+      dotnet ef migrations add Inicial \
+        --project BrahmanGan.Infrastructure.Migrations.Postgres \
+        --startup-project BrahmanGan.API
+      (con Database:Provider=Postgres en la configuración activa)
+  -->
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BrahmanGan.Infrastructure\BrahmanGan.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,81 @@
+# Proveedores de base de datos (SQL Server / PostgreSQL)
+
+BrahmanGan soporta **dos proveedores de base de datos** de forma intercambiable mediante
+configuración: **SQL Server** (por defecto) y **PostgreSQL**. El modelo de datos es el mismo;
+solo cambian el proveedor EF Core, la cadena de conexión y el set de migraciones.
+
+## Cómo elegir el proveedor
+
+En `appsettings.json` (o por variable de entorno / secreto):
+
+```jsonc
+{
+  "Database": {
+    "Provider": "SqlServer"   // "SqlServer" (por defecto) o "Postgres"
+  }
+}
+```
+
+También por variable de entorno: `Database__Provider=Postgres`.
+
+## Cadenas de conexión
+
+Se leen según el proveedor activo:
+
+| Proveedor | Cadena principal | Event Store |
+|-----------|------------------|-------------|
+| SqlServer | `ConnectionStrings:DefaultConnection` | `ConnectionStrings:EventStoreConnection` |
+| Postgres  | `ConnectionStrings:DefaultConnection_Postgres` | `ConnectionStrings:EventStoreConnection_Postgres` |
+
+Ejemplo Postgres:
+
+```jsonc
+"ConnectionStrings": {
+  "DefaultConnection_Postgres": "Host=localhost;Port=5432;Database=BrahmanGanDb;Username=postgres;Password=****",
+  "EventStoreConnection_Postgres": "Host=localhost;Port=5432;Database=BrahmanGanEventStore;Username=postgres;Password=****"
+}
+```
+
+> No commitees credenciales reales. Los valores versionados usan `CHANGE_ME` como marcador.
+
+## Migraciones (una por proveedor)
+
+Las migraciones EF Core **no son portables** entre proveedores, por eso cada uno tiene su
+propio proyecto/assembly y el proveedor activo determina cuál se aplica en runtime:
+
+- `BrahmanGan.Infrastructure.Migrations.SqlServer` — migraciones para SQL Server (ya existentes).
+- `BrahmanGan.Infrastructure.Migrations.Postgres` — migraciones para PostgreSQL.
+
+La selección de proveedor, cadena y assembly de migraciones está centralizada en
+`BrahmanGan.Infrastructure/Adapters/Persistence/DatabaseProviderResolver.cs`.
+
+### Generar / regenerar migraciones
+
+Requiere el **SDK de .NET 10** y `dotnet-ef`. Ejecuta con el proveedor deseado activo:
+
+```bash
+# PostgreSQL (con Database:Provider=Postgres)
+dotnet ef migrations add Inicial \
+  --project BrahmanGan.Infrastructure.Migrations.Postgres \
+  --startup-project BrahmanGan.API
+
+# SQL Server (con Database:Provider=SqlServer)
+dotnet ef migrations add <Nombre> \
+  --project BrahmanGan.Infrastructure.Migrations.SqlServer \
+  --startup-project BrahmanGan.API
+```
+
+Al arrancar, `DbInitializer.InicializarAsync` aplica automáticamente las migraciones
+pendientes (`Database.MigrateAsync`) del proveedor activo y siembra el usuario administrador.
+
+## Notas técnicas
+
+- **Defaults de fecha**: las `Configurations` declaran defaults de SQL Server
+  (`GETUTCDATE()` / `GETDATE()`). Cuando el proveedor es PostgreSQL se traducen
+  automáticamente (`now() at time zone 'utc'` / `LOCALTIMESTAMP`) en un único lugar
+  (`ApplicationDbContext.OnModelCreating`), sin tocar las Configurations.
+- **Event Store**: `EventData` usa `text` en Postgres y `nvarchar(max)` en SQL Server.
+- **Timestamps de Npgsql**: se habilita `Npgsql.EnableLegacyTimestampBehavior` para mapear
+  `DateTime` a `timestamp without time zone` (equivalente al `datetime2` de SQL Server) y
+  evitar el modo estricto de Kind de Npgsql 6+.
+- Los tipos `decimal(p,s)` y `char(1)` son portables (Npgsql los mapea a `numeric`/`char`).

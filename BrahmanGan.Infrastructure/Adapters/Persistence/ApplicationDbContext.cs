@@ -127,6 +127,27 @@ public class ApplicationDbContext : DbContext
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
+        // Los archivos de Configurations declaran defaults con funciones de SQL Server
+        // (GETUTCDATE()/GETDATE()). Cuando el proveedor activo es PostgreSQL, se traducen
+        // a sus equivalentes de Postgres en un único lugar, dejando las Configurations
+        // (y sus ~54 usos) intactas y agnósticas del proveedor.
+        if (Database.IsNpgsql())
+        {
+            foreach (var property in modelBuilder.Model.GetEntityTypes()
+                         .SelectMany(e => e.GetProperties()))
+            {
+                var defaultSql = property.GetDefaultValueSql();
+                if (string.IsNullOrWhiteSpace(defaultSql)) continue;
+
+                var traducido = defaultSql
+                    .Replace("GETUTCDATE()", "now() at time zone 'utc'", StringComparison.OrdinalIgnoreCase)
+                    .Replace("GETDATE()", "LOCALTIMESTAMP", StringComparison.OrdinalIgnoreCase);
+
+                if (!string.Equals(traducido, defaultSql, StringComparison.Ordinal))
+                    property.SetDefaultValueSql(traducido);
+            }
+        }
+
         // EF Core uses null as the sentinel for reference-type keys, but every IntId
         // subtype uses IntId(0) as "not yet assigned". This loop tells EF Core that
         // XxxId(0) is the sentinel so it marks those entities as "needs generation"
