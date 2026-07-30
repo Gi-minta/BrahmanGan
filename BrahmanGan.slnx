@@ -6,4 +6,6 @@
   <Project Path="BrahmanGan.Application/BrahmanGan.Application.csproj" />
   <Project Path="BrahmanGan.Domain/BrahmanGan.Domain.csproj" />
   <Project Path="BrahmanGan.Infrastructure/BrahmanGan.Infrastructure.csproj" />
+  <Project Path="BrahmanGan.Infrastructure.Migrations.SqlServer/BrahmanGan.Infrastructure.Migrations.SqlServer.csproj" />
+  <Project Path="BrahmanGan.Infrastructure.Migrations.Postgres/BrahmanGan.Infrastructure.Migrations.Postgres.csproj" />
 </Solution>

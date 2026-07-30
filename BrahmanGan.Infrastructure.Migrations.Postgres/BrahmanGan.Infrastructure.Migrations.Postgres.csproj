@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!--
+    Assembly de migraciones EF Core para PostgreSQL.
+    El proveedor activo (Database:Provider=Postgres) hace que en runtime se use este
+    assembly. Para regenerar el set de migraciones ver DATABASE_PROVIDERS.md
+    (dotnet ef migrations add, apuntando a este proyecto con la API como startup).
+  -->
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BrahmanGan.Infrastructure\BrahmanGan.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -10,6 +10,10 @@
   <ItemGroup>
     <ProjectReference Include="..\BrahmanGan.Application\BrahmanGan.Application.csproj" />
     <ProjectReference Include="..\BrahmanGan.Infrastructure\BrahmanGan.Infrastructure.csproj" />
+    <!-- Assemblies de migraciones por proveedor: deben cargarse para que EF Core los
+         encuentre en runtime según Database:Provider (SQL Server o PostgreSQL). -->
+    <ProjectReference Include="..\BrahmanGan.Infrastructure.Migrations.SqlServer\BrahmanGan.Infrastructure.Migrations.SqlServer.csproj" />
+    <ProjectReference Include="..\BrahmanGan.Infrastructure.Migrations.Postgres\BrahmanGan.Infrastructure.Migrations.Postgres.csproj" />
   </ItemGroup>
 
   <ItemGroup>
