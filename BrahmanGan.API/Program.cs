@@ -15,6 +15,9 @@ builder.Services.AddControllers()
 // ── Swagger ────────────────────────────────────────────────────
 builder.Services.AddSwaggerDocumentation();
 
+// ── Clave de firma JWT (obligatoria; efímera solo en Development) ──
+BrahmanGan.API.Extensions.JwtKeyBootstrap.EnsureJwtSecretKey(builder.Configuration, builder.Environment);
+
 // ── Autenticación JWT + OAuth2 (Google) ────────────────────────
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
