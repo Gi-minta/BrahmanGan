@@ -18,7 +18,7 @@ public static class AuthExtensions
         var issuer    = config["Jwt:Issuer"]   ?? "BrahmanGan";
         var audience  = config["Jwt:Audience"] ?? "BrahmanGanClient";
 
-        services
+        var authBuilder = services
             .AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -46,14 +46,25 @@ public static class AuthExtensions
                         return Task.CompletedTask;
                     }
                 };
-            })
-            .AddGoogle(options =>
+            });
+
+        // OAuth2 con Google: se registra SOLO si hay credenciales configuradas. Sin ellas,
+        // el login con Google queda deshabilitado y la app arranca igual (AddGoogle valida
+        // que ClientId/ClientSecret no estén vacíos y, de lo contrario, falla al arrancar).
+        // Configúralas de forma segura: OAuth__Google__ClientId / OAuth__Google__ClientSecret,
+        // user-secrets o un appsettings NO versionado.
+        var googleClientId     = config["OAuth:Google:ClientId"];
+        var googleClientSecret = config["OAuth:Google:ClientSecret"];
+        if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret))
+        {
+            authBuilder.AddGoogle(options =>
             {
-                options.ClientId     = config["OAuth:Google:ClientId"]     ?? "";
-                options.ClientSecret = config["OAuth:Google:ClientSecret"] ?? "";
+                options.ClientId     = googleClientId;
+                options.ClientSecret = googleClientSecret;
                 // El callback estándar es /signin-google pero en SPA usaremos el flujo "token" manual.
                 options.SaveTokens   = true;
             });
+        }
 
         // Políticas de autorización basadas en roles
         services.AddAuthorizationBuilder()
