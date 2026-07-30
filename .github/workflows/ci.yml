@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      # El .slnx referencia proyectos de test externos al repo, por lo que se compilan
+      # los proyectos concretos: la API (arrastra Domain, Application, Infrastructure y
+      # los dos assemblies de migraciones) y el proyecto de tests unitarios.
+      - name: Build (API + dependencias)
+        run: dotnet build BrahmanGan.API/BrahmanGan.API.csproj -c Release
+
+      - name: Test
+        run: dotnet test tests/BrahmanGan.UnitTests/BrahmanGan.UnitTests.csproj -c Release --verbosity normal
