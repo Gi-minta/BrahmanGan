@@ -42,6 +42,14 @@ services:
       ConnectionStrings__EventStoreConnection_Postgres: "Host=postgres;Port=5432;Database=BrahmanGanDb;Username=postgres;Password=postgres"
     ports:
       - "8080:8080"
+    # La imagen slim de .NET no trae curl/wget, pero sí bash: se consulta /health/live
+    # con una petición HTTP mínima vía /dev/tcp.
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/8080; printf 'GET /health/live HTTP/1.1\nHost: localhost\nConnection: close\n\n' >&3; grep -q '200' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 volumes:
   pgdata:
