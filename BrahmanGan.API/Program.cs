@@ -27,6 +27,12 @@ builder.Services.AddApplication();
 // ── Infrastructure Layer ───────────────────────────────────────
 builder.Services.AddInfrastructure(builder.Configuration);
 
+// ── Health checks ──────────────────────────────────────────────
+// /health incluye un chequeo de conectividad a la base de datos (agnóstico del
+// proveedor: SQL Server o PostgreSQL). /health/live es solo liveness (no toca la BD).
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<ApplicationDbContext>("database");
+
 // ── CORS — permite el cliente React en desarrollo ──────────────
 builder.Services.AddCors(options =>
 {
@@ -67,6 +73,15 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// ── Health checks ──────────────────────────────────────────────
+// /health      → estado general (incluye conectividad a la BD).
+// /health/live → liveness (sin dependencias externas).
+app.MapHealthChecks("/health").AllowAnonymous();
+app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = _ => false
+}).AllowAnonymous();
 
 // ── Seed inicial (admin + migración) ──────────────────────────
 await DbInitializer.InicializarAsync(app.Services);
