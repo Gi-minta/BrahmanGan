@@ -16,11 +16,15 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Xunit.SkippableFact" Version="1.4.13" />
+    <!-- Pruebas de endpoints HTTP (arranca la API en memoria con TestServer). -->
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <!-- Se referencia el assembly de migraciones de Postgres para que EF Core lo encuentre
-         en runtime al aplicar las migraciones. -->
+         en runtime al aplicar las migraciones. La API se referencia para las pruebas de
+         endpoints (WebApplicationFactory<Program>). -->
+    <ProjectReference Include="..\..\BrahmanGan.API\BrahmanGan.API.csproj" />
     <ProjectReference Include="..\..\BrahmanGan.Infrastructure\BrahmanGan.Infrastructure.csproj" />
     <ProjectReference Include="..\..\BrahmanGan.Infrastructure.Migrations.Postgres\BrahmanGan.Infrastructure.Migrations.Postgres.csproj" />
   </ItemGroup>

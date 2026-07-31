@@ -87,3 +87,6 @@ app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthC
 await DbInitializer.InicializarAsync(app.Services);
 
 app.Run();
+
+// Hace la clase Program accesible para las pruebas de endpoints (WebApplicationFactory<Program>).
+public partial class Program { }
