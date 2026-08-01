@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api/client';
+import Modal from '../components/Modal';
 import { useAuth } from '../auth/useAuth';
 
 interface RolResponse {
@@ -31,6 +32,8 @@ export default function SeguridadPage() {
   const [usuarios, setUsuarios] = useState<UsuarioResponse[]>([]);
   const [cargando, setCargando] = useState(false);
   const [error, setError]       = useState('');
+  // Se incrementa tras crear o restablecer, para volver a pedir la lista.
+  const [recarga, setRecarga]   = useState(0);
 
   const esAdmin = tieneRol('Administrador');
 
@@ -39,12 +42,18 @@ export default function SeguridadPage() {
     setCargando(true);
     setError('');
 
+    // La pestaña de usuarios necesita también los roles: el alta pide elegir uno.
     const promesa = tab === 'roles'
       ? api.get<RolResponse[]>('/roles').then(r => { setRoles(r); })
-      : api.get<UsuarioResponse[]>('/usuarios').then(u => { setUsuarios(u); });
+      : tab === 'usuarios'
+        ? Promise.all([
+            api.get<UsuarioResponse[]>('/usuarios'),
+            api.get<RolResponse[]>('/roles'),
+          ]).then(([u, r]) => { setUsuarios(u); setRoles(r); })
+        : api.get<RolResponse[]>('/roles').then(r => { setRoles(r); });
 
     promesa.catch(e => setError(e.message)).finally(() => setCargando(false));
-  }, [tab, esAdmin]);
+  }, [tab, esAdmin, recarga]);
 
   if (!esAdmin) {
     return (
@@ -87,7 +96,7 @@ export default function SeguridadPage() {
       ) : tab === 'roles' ? (
         <RolesTab roles={roles} />
       ) : tab === 'usuarios' ? (
-        <UsuariosTab usuarios={usuarios} />
+        <UsuariosTab usuarios={usuarios} roles={roles} onCambio={() => setRecarga(n => n + 1)} />
       ) : (
         <PermisosTab roles={roles} />
       )}
@@ -136,14 +145,128 @@ function RolesTab({ roles }: { roles: RolResponse[] }) {
 }
 
 // ── Usuarios ───────────────────────────────────────────────────
-function UsuariosTab({ usuarios }: { usuarios: UsuarioResponse[] }) {
+function UsuariosTab({ usuarios, roles, onCambio }: {
+  usuarios: UsuarioResponse[];
+  roles: RolResponse[];
+  onCambio: () => void;
+}) {
+  const [modal, setModal]     = useState<'crear' | 'restablecer' | null>(null);
+  const [destino, setDestino] = useState<UsuarioResponse | null>(null);
+  const [form, setForm]       = useState({ email: '', nombreCompleto: '', password: '', rolId: 0 });
+  const [msg, setMsg]         = useState('');
+  const [err, setErr]         = useState('');
+  const [enviando, setEnv]    = useState(false);
+
+  function abrirCrear() {
+    setForm({ email: '', nombreCompleto: '', password: '', rolId: roles[0]?.id ?? 0 });
+    setErr(''); setMsg(''); setModal('crear');
+  }
+
+  function abrirRestablecer(u: UsuarioResponse) {
+    setDestino(u);
+    setForm(f => ({ ...f, password: '' }));
+    setErr(''); setMsg(''); setModal('restablecer');
+  }
+
+  async function enviar() {
+    setErr(''); setEnv(true);
+    try {
+      if (modal === 'crear') {
+        await api.post('/usuarios', {
+          email: form.email,
+          nombreCompleto: form.nombreCompleto,
+          passwordTemporal: form.password,
+          rolId: form.rolId,
+        });
+        setMsg(`Usuario ${form.email} creado. Entrégale la contraseña temporal: deberá cambiarla al entrar.`);
+      } else if (destino) {
+        await api.post(`/usuarios/${destino.id}/restablecer-password`, {
+          passwordTemporal: form.password,
+        });
+        setMsg(`Contraseña de ${destino.email} restablecida. Sus sesiones abiertas se cerraron.`);
+      }
+      setModal(null);
+      onCambio();
+    } catch (e: unknown) {
+      setErr(e instanceof Error ? e.message : 'No se pudo completar la operación.');
+    } finally {
+      setEnv(false);
+    }
+  }
+
   return (
+    <div className="space-y-3">
+      {msg && (
+        <div className="bg-green-50 border border-green-200 text-green-800 rounded-xl p-3 text-sm">
+          {msg}
+        </div>
+      )}
+
+      <div className="flex justify-end">
+        <button onClick={abrirCrear} className="btn-primary text-sm px-4 py-2">
+          Nuevo usuario
+        </button>
+      </div>
+
+      {modal !== null && (
+      <Modal onClose={() => setModal(null)}
+        titulo={modal === 'crear' ? 'Nuevo usuario' : `Restablecer contraseña de ${destino?.email ?? ''}`}>
+        <div className="space-y-3">
+          {err && (
+            <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm">{err}</div>
+          )}
+
+          {modal === 'crear' && (
+            <>
+              <div>
+                <label className="label">Correo electrónico</label>
+                <input className="input" type="email" value={form.email}
+                  onChange={e => setForm({ ...form, email: e.target.value })} />
+              </div>
+              <div>
+                <label className="label">Nombre completo</label>
+                <input className="input" type="text" value={form.nombreCompleto}
+                  onChange={e => setForm({ ...form, nombreCompleto: e.target.value })} />
+              </div>
+              <div>
+                <label className="label">Rol</label>
+                <select className="input" value={form.rolId}
+                  onChange={e => setForm({ ...form, rolId: Number(e.target.value) })}>
+                  {roles.map(r => <option key={r.id} value={r.id}>{r.nombre}</option>)}
+                </select>
+              </div>
+            </>
+          )}
+
+          <div>
+            <label className="label">Contraseña temporal</label>
+            <input className="input" type="text" value={form.password} minLength={8}
+              onChange={e => setForm({ ...form, password: e.target.value })} />
+            {/* Se muestra en claro a propósito: el administrador tiene que poder
+                copiarla para entregársela al usuario. */}
+            <p className="text-xs text-slate-500 mt-1">
+              Mínimo 8 caracteres. El usuario deberá cambiarla la primera vez que entre.
+            </p>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <button className="btn-secondary text-sm px-4 py-2" onClick={() => setModal(null)}>
+              Cancelar
+            </button>
+            <button className="btn-primary text-sm px-4 py-2" disabled={enviando} onClick={enviar}>
+              {enviando ? 'Guardando…' : 'Guardar'}
+            </button>
+          </div>
+        </div>
+      </Modal>
+      )}
+
     <div className="card overflow-x-auto p-0">
       <table className="w-full text-sm">
         <thead className="bg-slate-50 border-b border-slate-200">
           <tr>
-            {['Usuario','Email','Proveedor','Roles','Último acceso','Estado'].map(h => (
-              <th key={h} className="px-4 py-3 text-left text-slate-600 font-semibold">{h}</th>
+            {['Usuario','Email','Proveedor','Roles','Último acceso','Estado',''].map((h, i) => (
+              <th key={i} className="px-4 py-3 text-left text-slate-600 font-semibold">{h}</th>
             ))}
           </tr>
         </thead>
@@ -180,10 +303,20 @@ function UsuariosTab({ usuarios }: { usuarios: UsuarioResponse[] }) {
                   {u.activo ? 'Activo' : 'Inactivo'}
                 </span>
               </td>
+              <td className="px-4 py-3 text-right">
+                {/* Los usuarios de Google no tienen contraseña local que restablecer. */}
+                {u.proveedor !== 'Google' && (
+                  <button onClick={() => abrirRestablecer(u)}
+                    className="text-xs text-brand-700 hover:text-brand-900 font-medium">
+                    Restablecer contraseña
+                  </button>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+    </div>
     </div>
   );
 }

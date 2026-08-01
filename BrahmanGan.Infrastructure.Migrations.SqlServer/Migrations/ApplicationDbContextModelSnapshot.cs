@@ -4021,6 +4021,9 @@ namespace BrahmanGan.Infrastructure.Adapters.Persistence.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
+                    b.Property<bool>("DebeCambiarPassword")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(200)

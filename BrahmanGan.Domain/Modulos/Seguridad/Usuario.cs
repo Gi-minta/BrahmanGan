@@ -18,6 +18,13 @@ public sealed class Usuario : AggregateRoot<UsuarioId>
     public string? IdExterno { get; private set; }
     public bool EmailConfirmado { get; private set; }
     public bool Activo { get; private set; } = true;
+
+    /// <summary>
+    /// La contraseña actual la fijó un administrador, así que es temporal y el usuario
+    /// debe sustituirla antes de poder trabajar. Se apaga sola al cambiarla.
+    /// </summary>
+    public bool DebeCambiarPassword { get; private set; }
+
     public DateTime FechaCreacion { get; private set; } = DateTime.UtcNow;
     public DateTime? UltimoAcceso { get; private set; }
 
@@ -100,6 +107,22 @@ public sealed class Usuario : AggregateRoot<UsuarioId>
         if (Proveedor != ProveedorAuth.Local)
             throw new BusinessRuleException("Los usuarios OAuth2 no usan contraseña local.");
         PasswordHash = nuevoHash;
+        // La eligió el propio usuario, así que deja de ser temporal.
+        DebeCambiarPassword = false;
+    }
+
+    /// <summary>
+    /// Fija una contraseña temporal puesta por un administrador. El usuario podrá entrar
+    /// con ella, pero queda obligado a cambiarla.
+    /// </summary>
+    public void EstablecerPasswordTemporal(string nuevoHash)
+    {
+        if (Proveedor != ProveedorAuth.Local)
+            throw new BusinessRuleException("Los usuarios OAuth2 no usan contraseña local.");
+        if (string.IsNullOrWhiteSpace(nuevoHash))
+            throw new BusinessRuleException("El hash de contraseña es requerido.");
+        PasswordHash = nuevoHash;
+        DebeCambiarPassword = true;
     }
 
     public void Desactivar()

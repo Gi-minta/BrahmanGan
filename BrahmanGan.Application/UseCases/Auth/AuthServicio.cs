@@ -161,7 +161,8 @@ public sealed class AuthServicio : IAuthServicio
             usuario.Email,
             usuario.NombreCompleto,
             roles,
-            permisos);
+            permisos,
+            usuario.DebeCambiarPassword);
 
         var accessToken  = _jwt.GenerarAccessToken(info);
         var refreshToken = _jwt.GenerarRefreshToken();
@@ -242,10 +243,59 @@ public sealed class UsuarioAdminServicio : IUsuarioAdminServicio
     private readonly IUsuarioRepository _usuarios;
     private readonly IRolRepository _roles;
     private readonly IUnitOfWork _uow;
+    private readonly IPasswordHasher _hasher;
 
-    public UsuarioAdminServicio(IUsuarioRepository usuarios, IRolRepository roles, IUnitOfWork uow)
+    public UsuarioAdminServicio(
+        IUsuarioRepository usuarios,
+        IRolRepository roles,
+        IUnitOfWork uow,
+        IPasswordHasher hasher)
     {
-        _usuarios = usuarios; _roles = roles; _uow = uow;
+        _usuarios = usuarios; _roles = roles; _uow = uow; _hasher = hasher;
+    }
+
+    public async Task<UsuarioResponse> CrearUsuarioAsync(
+        CrearUsuarioAdminRequest request, CancellationToken ct = default)
+    {
+        if (await _usuarios.ExisteEmailAsync(request.Email, ct))
+            throw new BusinessRuleException("Ya existe una cuenta con ese email.");
+
+        var rol = await _roles.ObtenerPorIdAsync(Domain.Common.RolId.From(request.RolId), ct)
+            ?? throw new AppEntityNotFoundException("Rol", request.RolId);
+
+        var hash = _hasher.Hashear(request.PasswordTemporal);
+        var usuario = Usuario.CrearLocal(request.Email, request.NombreCompleto, hash);
+
+        // La puso un administrador, así que el usuario debe cambiarla al entrar.
+        usuario.EstablecerPasswordTemporal(hash);
+
+        // El alta la hace un administrador, no hay que verificar el buzón.
+        usuario.ConfirmarEmail();
+
+        // El rol se asigna antes de añadir, dentro del mismo SaveChanges: hacerlo después
+        // de guardar deja la relación sin persistir.
+        usuario.AsignarRol(rol);
+
+        await _usuarios.AgregarAsync(usuario, ct);
+        await _uow.SaveChangesAsync(ct);
+
+        return MapUsuario(await _usuarios.ObtenerConRolesAsync(usuario.Id, ct) ?? usuario);
+    }
+
+    public async Task RestablecerPasswordAsync(
+        int id, RestablecerPasswordAdminRequest request, CancellationToken ct = default)
+    {
+        var usuario = await _usuarios.ObtenerPorIdAsync(Domain.Common.UsuarioId.From(id), ct)
+            ?? throw new AppEntityNotFoundException("Usuario", id);
+
+        usuario.EstablecerPasswordTemporal(_hasher.Hashear(request.PasswordTemporal));
+
+        // Cierra las sesiones abiertas: si el acceso se restablece es porque se perdió el
+        // control de la cuenta, y un refresh token vivo la mantendría abierta.
+        usuario.RevocarRefreshToken();
+
+        await _usuarios.ActualizarAsync(usuario, ct);
+        await _uow.SaveChangesAsync(ct);
     }
 
     public async Task<IEnumerable<UsuarioResponse>> ListarUsuariosAsync(CancellationToken ct = default)
