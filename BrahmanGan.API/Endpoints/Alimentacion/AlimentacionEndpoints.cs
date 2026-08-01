@@ -9,7 +9,6 @@ public sealed class CrearPlanAlimentacionEndpoint(IAlimentacionService svc) : En
     public override void Configure()
     {
         Post("api/alimentacion/planes");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CrearPlanAlimentacionRequest req, CancellationToken ct)
@@ -21,7 +20,6 @@ public sealed class ObtenerPlanAlimentacionEndpoint(IAlimentacionService svc) : 
     public override void Configure()
     {
         Get("api/alimentacion/planes/{id:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -41,7 +39,6 @@ public sealed class ListarPlanesAlimentacionEndpoint(IAlimentacionService svc) :
     public override void Configure()
     {
         Get("api/alimentacion/planes");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -53,7 +50,6 @@ public sealed class ListarPlanesAlimentacionPorFincaEndpoint(IAlimentacionServic
     public override void Configure()
     {
         Get("api/alimentacion/planes/finca/{idFinca:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -65,7 +61,6 @@ public sealed class DesactivarPlanAlimentacionEndpoint(IAlimentacionService svc)
     public override void Configure()
     {
         Patch("api/alimentacion/planes/{id:int}/desactivar");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -80,7 +75,6 @@ public sealed class AgregarDetallePlanEndpoint(IAlimentacionService svc) : Endpo
     public override void Configure()
     {
         Post("api/alimentacion/detalles");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(AgregarDetallePlanRequest req, CancellationToken ct)
@@ -92,7 +86,6 @@ public sealed class ListarDetallesPlanEndpoint(IAlimentacionService svc) : Endpo
     public override void Configure()
     {
         Get("api/alimentacion/planes/{idPlan:int}/detalles");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

@@ -9,7 +9,6 @@ public sealed class RegistrarPesajeEndpoint(IPesajeService svc) : Endpoint<Regis
     public override void Configure()
     {
         Post("api/pesajes");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(RegistrarPesajeRequest req, CancellationToken ct)
@@ -21,7 +20,6 @@ public sealed class ListarPesajesPorAnimalEndpoint(IPesajeService svc) : Endpoin
     public override void Configure()
     {
         Get("api/pesajes/animal/{idAnimal:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

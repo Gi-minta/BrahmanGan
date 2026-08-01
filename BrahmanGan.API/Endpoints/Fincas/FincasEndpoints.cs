@@ -9,7 +9,6 @@ public sealed class CrearFincaEndpoint(IFincaService svc) : Endpoint<CrearFincaR
     public override void Configure()
     {
         Post("api/fincas");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CrearFincaRequest req, CancellationToken ct)
@@ -21,7 +20,6 @@ public sealed class ObtenerFincaEndpoint(IFincaService svc) : EndpointWithoutReq
     public override void Configure()
     {
         Get("api/fincas/{id:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -41,7 +39,6 @@ public sealed class ListarFincasEndpoint(IFincaService svc) : EndpointWithoutReq
     public override void Configure()
     {
         Get("api/fincas");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

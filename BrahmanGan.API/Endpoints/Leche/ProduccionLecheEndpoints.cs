@@ -9,7 +9,6 @@ public sealed class RegistrarProduccionLecheEndpoint(IProduccionLecheService svc
     public override void Configure()
     {
         Post("api/produccion-leche");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(RegistrarProduccionLecheRequest req, CancellationToken ct)

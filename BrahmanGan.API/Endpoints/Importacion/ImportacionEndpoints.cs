@@ -21,7 +21,6 @@ public abstract class ImportacionEndpointBase : Endpoint<ImportArchivoRequest, I
     public override void Configure()
     {
         Post($"api/importacion/{Modulo}");
-        AllowAnonymous();
         AllowFileUploads();
     }
 
@@ -258,7 +257,6 @@ public sealed class DescargarPlantillaEndpoint : EndpointWithoutRequest
     public override void Configure()
     {
         Get("api/importacion/plantilla/{modulo}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -282,7 +280,6 @@ public sealed class ListarModulosImportacionEndpoint : EndpointWithoutRequest<IR
     public override void Configure()
     {
         Get("api/importacion/modulos");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

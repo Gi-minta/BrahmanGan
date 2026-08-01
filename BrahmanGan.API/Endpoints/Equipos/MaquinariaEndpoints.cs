@@ -9,7 +9,6 @@ public sealed class CrearMaquinariaEndpoint(IMaquinariaService svc) : Endpoint<C
     public override void Configure()
     {
         Post("api/maquinaria");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CrearMaquinariaRequest req, CancellationToken ct)
@@ -21,7 +20,6 @@ public sealed class ObtenerMaquinariaEndpoint(IMaquinariaService svc) : Endpoint
     public override void Configure()
     {
         Get("api/maquinaria/{id:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -41,7 +39,6 @@ public sealed class ListarMaquinariaEndpoint(IMaquinariaService svc) : EndpointW
     public override void Configure()
     {
         Get("api/maquinaria");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -53,7 +50,6 @@ public sealed class RegistrarMantenimientoEndpoint(IMaquinariaService svc) : End
     public override void Configure()
     {
         Post("api/maquinaria/mantenimiento");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(RegistrarMantenimientoRequest req, CancellationToken ct)
@@ -65,7 +61,6 @@ public sealed class ListarMantenimientosEndpoint(IMaquinariaService svc) : Endpo
     public override void Configure()
     {
         Get("api/maquinaria/{id:int}/mantenimientos");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

@@ -9,7 +9,6 @@ public sealed class CrearRazaEndpoint(IRazaService svc) : Endpoint<CrearRazaRequ
     public override void Configure()
     {
         Post("api/razas");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CrearRazaRequest req, CancellationToken ct)
@@ -21,7 +20,6 @@ public sealed class ListarRazasEndpoint(IRazaService svc) : EndpointWithoutReque
     public override void Configure()
     {
         Get("api/razas");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

@@ -19,6 +19,8 @@ public sealed class LoginEndpoint(IAuthServicio auth) : Endpoint<LoginRequest, T
     public override void Configure()
     {
         Post("api/auth/login");
+        // Anónimo por necesidad: es el endpoint que emite el token. Exigir autenticación
+        // aquí dejaría fuera a todo el mundo, sin forma de entrar.
         AllowAnonymous();
     }
 
@@ -26,13 +28,16 @@ public sealed class LoginEndpoint(IAuthServicio auth) : Endpoint<LoginRequest, T
         => await Send.OkAsync(await auth.LoginAsync(req, ct), ct);
 }
 
-/// <summary>Registro de nuevo usuario.</summary>
+/// <summary>
+/// Alta de un usuario. Reservada a administradores: el registro era anónimo, lo que
+/// permitía a cualquiera crearse una cuenta en la API pública.
+/// </summary>
 public sealed class RegistrarUsuarioEndpoint(IAuthServicio auth) : Endpoint<RegistrarUsuarioRequest, TokenResponse>
 {
     public override void Configure()
     {
         Post("api/auth/registrar");
-        AllowAnonymous();
+        Policies("Administrador");
     }
 
     public override async Task HandleAsync(RegistrarUsuarioRequest req, CancellationToken ct)
@@ -48,6 +53,8 @@ public sealed class RefreshTokenEndpoint(IAuthServicio auth) : Endpoint<RefreshT
     public override void Configure()
     {
         Post("api/auth/refresh");
+        // Anónimo por necesidad: se invoca precisamente cuando el access token ya expiró.
+        // La credencial que autoriza la operación es el refresh token del cuerpo.
         AllowAnonymous();
     }
 
@@ -90,6 +97,8 @@ public sealed class LoginGoogleEndpoint(IAuthServicio auth) : Endpoint<OAuthCall
     public override void Configure()
     {
         Post("api/auth/oauth/google");
+        // Anónimo por necesidad: es una vía de entrada alternativa al login, y quien la
+        // usa todavía no tiene token.
         AllowAnonymous();
     }
 

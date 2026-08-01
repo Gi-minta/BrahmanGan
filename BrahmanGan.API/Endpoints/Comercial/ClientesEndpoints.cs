@@ -9,7 +9,6 @@ public sealed class CrearClienteEndpoint(IClienteService svc) : Endpoint<CrearCl
     public override void Configure()
     {
         Post("api/clientes");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CrearClienteRequest req, CancellationToken ct)
@@ -21,7 +20,6 @@ public sealed class ObtenerClienteEndpoint(IClienteService svc) : EndpointWithou
     public override void Configure()
     {
         Get("api/clientes/{id:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -41,7 +39,6 @@ public sealed class ListarClientesEndpoint(IClienteService svc) : EndpointWithou
     public override void Configure()
     {
         Get("api/clientes");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

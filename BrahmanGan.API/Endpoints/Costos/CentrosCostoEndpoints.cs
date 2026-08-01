@@ -9,7 +9,6 @@ public sealed class CrearCentroCostoEndpoint(ICentroCostoService svc) : Endpoint
     public override void Configure()
     {
         Post("api/centros-costo");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CrearCentroCostoRequest req, CancellationToken ct)
@@ -21,7 +20,6 @@ public sealed class ListarCentrosCostoEndpoint(ICentroCostoService svc) : Endpoi
     public override void Configure()
     {
         Get("api/centros-costo");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

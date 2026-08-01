@@ -9,7 +9,6 @@ public sealed class CrearMedicamentoEndpoint(IMedicamentoService svc) : Endpoint
     public override void Configure()
     {
         Post("api/medicamentos");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CrearMedicamentoRequest req, CancellationToken ct)
@@ -21,7 +20,6 @@ public sealed class ListarMedicamentosEndpoint(IMedicamentoService svc) : Endpoi
     public override void Configure()
     {
         Get("api/medicamentos");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -33,7 +31,6 @@ public sealed class CrearControlPreventivoEndpoint(IMedicamentoService svc) : En
     public override void Configure()
     {
         Post("api/medicamentos/controles");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CrearControlPreventivoRequest req, CancellationToken ct)
@@ -45,7 +42,6 @@ public sealed class ListarControlesPreventivosEndpoint(IMedicamentoService svc) 
     public override void Configure()
     {
         Get("api/medicamentos/controles");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -57,7 +53,6 @@ public sealed class AplicarControlPreventivoEndpoint(IMedicamentoService svc) : 
     public override void Configure()
     {
         Post("api/medicamentos/controles/aplicar");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(AplicarControlPreventivoRequest req, CancellationToken ct)
@@ -69,7 +64,6 @@ public sealed class HistorialPreventivoEndpoint(IMedicamentoService svc) : Endpo
     public override void Configure()
     {
         Get("api/medicamentos/controles/historial/{idAnimal:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

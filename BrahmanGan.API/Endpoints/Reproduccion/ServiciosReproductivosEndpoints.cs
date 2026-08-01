@@ -9,7 +9,6 @@ public sealed class RegistrarMontaEndpoint(IServicioReproductivoService svc) : E
     public override void Configure()
     {
         Post("api/servicios-reproductivos/monta");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(RegistrarMontaRequest req, CancellationToken ct)
@@ -21,7 +20,6 @@ public sealed class RegistrarIaEndpoint(IServicioReproductivoService svc) : Endp
     public override void Configure()
     {
         Post("api/servicios-reproductivos/ia");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(RegistrarIaRequest req, CancellationToken ct)
@@ -33,7 +31,6 @@ public sealed class ConfirmarServicioEndpoint(IServicioReproductivoService svc) 
     public override void Configure()
     {
         Put("api/servicios-reproductivos/{id:int}/confirmar");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(ConfirmarServicioRequest req, CancellationToken ct)
@@ -48,7 +45,6 @@ public sealed class ListarServiciosPorHembraEndpoint(IServicioReproductivoServic
     public override void Configure()
     {
         Get("api/servicios-reproductivos/hembra/{idHembra:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -61,7 +57,6 @@ public sealed class CrearSemenEndpoint(IServicioReproductivoService svc) : Endpo
     public override void Configure()
     {
         Post("api/servicios-reproductivos/semen");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CrearSemenRequest req, CancellationToken ct)
@@ -73,7 +68,6 @@ public sealed class ListarSemenEndpoint(IServicioReproductivoService svc) : Endp
     public override void Configure()
     {
         Get("api/servicios-reproductivos/semen");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -85,7 +79,6 @@ public sealed class ObtenerSemenEndpoint(IServicioReproductivoService svc) : End
     public override void Configure()
     {
         Get("api/servicios-reproductivos/semen/{id:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -105,7 +98,6 @@ public sealed class AjustarStockSemenEndpoint(IServicioReproductivoService svc) 
     public override void Configure()
     {
         Patch("api/servicios-reproductivos/semen/stock");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(AjustarStockSemenRequest req, CancellationToken ct)
@@ -118,7 +110,6 @@ public sealed class ObtenerNacimientoEndpoint(IServicioReproductivoService svc) 
     public override void Configure()
     {
         Get("api/servicios-reproductivos/nacimientos/{id:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -138,7 +129,6 @@ public sealed class ListarNacimientosPorGestacionEndpoint(IServicioReproductivoS
     public override void Configure()
     {
         Get("api/servicios-reproductivos/nacimientos/gestacion/{idGestacion:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

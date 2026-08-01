@@ -9,7 +9,6 @@ public sealed class RegistrarComplementoEndpoint(IComplementoService svc) : Endp
     public override void Configure()
     {
         Post("api/complementos");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(RegistrarComplementoRequest req, CancellationToken ct)
@@ -21,7 +20,6 @@ public sealed class ListarComplementosPorTratamientoEndpoint(IComplementoService
     public override void Configure()
     {
         Get("api/complementos/tratamiento/{idTratamiento:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
