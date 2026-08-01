@@ -75,7 +75,18 @@ app.UseFastEndpoints(c =>
         new System.Text.Json.Serialization.JsonStringEnumConverter());
 });
 
-if (app.Environment.IsDevelopment())
+// La documentación (Scalar en /scalar y el JSON en /swagger/v1/swagger.json) se publica
+// siempre en Development. Fuera de Development hay que habilitarla explícitamente con
+// OpenApi:Enabled — normalmente la variable de entorno OpenApi__Enabled=true.
+//
+// Se gobierna por configuración y no por el entorno para no obligar a arrancar producción
+// como Development, que además de los errores detallados haría que JwtKeyBootstrap genere
+// una clave de firma EFÍMERA y todos los tokens se invaliden en cada reinicio.
+//
+// Expone el catálogo completo de endpoints y sus esquemas, así que en un despliegue público
+// es una decisión deliberada: no exige autenticación para leerse (los endpoints sí la siguen
+// exigiendo). El valor por defecto es false.
+if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("OpenApi:Enabled"))
 {
     app.UseOpenApiDocumentation();
 }
