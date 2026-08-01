@@ -61,6 +61,37 @@ Ejemplo Postgres:
 
 > No commitees credenciales reales. Los valores versionados usan `CHANGE_ME` como marcador.
 
+### Formato URI (Render, Heroku, Railway…)
+
+Los hostings gestionados publican la cadena como URI en vez del formato clave-valor:
+
+```
+postgresql://usuario:password@host:5432/basedatos
+```
+
+Npgsql **no** entiende ese formato por sí solo —falla con *«Format of the initialization
+string does not conform to specification starting at index 0»*—, así que
+`DatabaseProviderResolver.NormalizarCadenaPostgres` la traduce automáticamente. Puedes pegar
+tal cual lo que te dé el proveedor, en cualquiera de las dos cadenas. Detalles:
+
+- Se aceptan los esquemas `postgresql://` y `postgres://`.
+- Sin puerto explícito se asume `5432`.
+- Usuario y contraseña se decodifican (`%40` → `@`), así que valen contraseñas con símbolos.
+- Los parámetros del query (`?sslmode=require`) se trasladan a sus claves equivalentes.
+  Npgsql rechaza los nombres que no reconoce en vez de descartarlos en silencio.
+- Una cadena que ya venga en formato clave-valor se usa intacta.
+
+Con el host **externo** de estos proveedores hace falta TLS: añade `?sslmode=require` a la
+URI (o `SSL Mode=Require;Trust Server Certificate=true` si usas el formato clave-valor). Con
+el host **interno**, cuando la app corre en el mismo proveedor y región, no es necesario.
+
+> Aunque la app comparta una sola base de datos entre `DefaultConnection*` y
+> `EventStoreConnection*`, **ambas variables deben definirse**. Los `appsettings` versionados
+> ya traen un valor para `EventStoreConnection_Postgres` (`localhost` + `CHANGE_ME`), de modo
+> que dejar la variable de entorno sin definir no activa el fallback de
+> `DependencyInjection.cs`: la configuración encuentra el valor del fichero y se intenta
+> conectar a `localhost`.
+
 ## Migraciones (una por proveedor)
 
 Las migraciones EF Core **no son portables** entre proveedores, por eso cada uno tiene su
