@@ -9,7 +9,6 @@ public sealed class RegistrarVentaLecheEndpoint(IVentaLecheService svc) : Endpoi
     public override void Configure()
     {
         Post("api/ventas-leche");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(RegistrarVentaLecheRequest req, CancellationToken ct)

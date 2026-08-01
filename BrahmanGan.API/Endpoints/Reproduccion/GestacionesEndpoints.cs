@@ -9,7 +9,6 @@ public sealed class IniciarGestacionEndpoint(IGestacionService svc) : Endpoint<I
     public override void Configure()
     {
         Post("api/gestaciones");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(IniciarGestacionRequest req, CancellationToken ct)
@@ -21,7 +20,6 @@ public sealed class ObtenerGestacionEndpoint(IGestacionService svc) : EndpointWi
     public override void Configure()
     {
         Get("api/gestaciones/{id:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -41,7 +39,6 @@ public sealed class RegistrarPartoEndpoint(IGestacionService svc) : Endpoint<Reg
     public override void Configure()
     {
         Put("api/gestaciones/{id:int}/parto");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(RegistrarPartoRequest req, CancellationToken ct)
@@ -56,7 +53,6 @@ public sealed class RegistrarAbortoEndpoint(IGestacionService svc) : Endpoint<Re
     public override void Configure()
     {
         Put("api/gestaciones/{id:int}/aborto");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(RegistrarAbortoRequest req, CancellationToken ct)

@@ -9,7 +9,6 @@ public sealed class AplicarVacunaEndpoint(IVacunacionService svc) : Endpoint<Apl
     public override void Configure()
     {
         Post("api/vacunaciones");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(AplicarVacunaRequest req, CancellationToken ct)
@@ -21,7 +20,6 @@ public sealed class ListarVacunacionesPorAnimalEndpoint(IVacunacionService svc) 
     public override void Configure()
     {
         Get("api/vacunaciones/animal/{idAnimal:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -33,7 +31,6 @@ public sealed class AlertasVacunacionEndpoint(IVacunacionService svc) : Endpoint
     public override void Configure()
     {
         Get("api/vacunaciones/alertas");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -45,7 +42,6 @@ public sealed class AplicarDesparasitacionEndpoint(IVacunacionService svc) : End
     public override void Configure()
     {
         Post("api/vacunaciones/desparasitacion");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(AplicarDesparasitacionRequest req, CancellationToken ct)
@@ -57,7 +53,6 @@ public sealed class ListarDesparasitacionesPorAnimalEndpoint(IVacunacionService 
     public override void Configure()
     {
         Get("api/vacunaciones/desparasitacion/animal/{idAnimal:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

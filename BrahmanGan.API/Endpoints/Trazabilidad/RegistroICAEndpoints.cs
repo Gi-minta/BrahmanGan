@@ -9,7 +9,6 @@ public sealed class EmitirRegistroICAEndpoint(IRegistroICAService svc) : Endpoin
     public override void Configure()
     {
         Post("api/registros-ica");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(EmitirRegistroICARequest req, CancellationToken ct)
@@ -21,7 +20,6 @@ public sealed class ListarRegistrosICAPorAnimalEndpoint(IRegistroICAService svc)
     public override void Configure()
     {
         Get("api/registros-ica/animal/{idAnimal:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -33,7 +31,6 @@ public sealed class RegistrosICAProximosVencerEndpoint(IRegistroICAService svc) 
     public override void Configure()
     {
         Get("api/registros-ica/proximos-vencer");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -45,7 +42,6 @@ public sealed class CancelarRegistroICAEndpoint(IRegistroICAService svc) : Endpo
     public override void Configure()
     {
         Delete("api/registros-ica/{id:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

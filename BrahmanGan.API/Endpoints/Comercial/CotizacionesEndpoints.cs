@@ -9,7 +9,6 @@ public sealed class CrearCotizacionEndpoint(ICotizacionVentaService svc) : Endpo
     public override void Configure()
     {
         Post("api/cotizaciones");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CrearCotizacionRequest req, CancellationToken ct)
@@ -21,7 +20,6 @@ public sealed class ObtenerCotizacionEndpoint(ICotizacionVentaService svc) : End
     public override void Configure()
     {
         Get("api/cotizaciones/{id:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -41,7 +39,6 @@ public sealed class AgregarDetalleCotizacionEndpoint(ICotizacionVentaService svc
     public override void Configure()
     {
         Post("api/cotizaciones/{id:int}/detalle");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(AgregarDetalleCotizacionRequest req, CancellationToken ct)
@@ -56,7 +53,6 @@ public sealed class AprobarCotizacionEndpoint(ICotizacionVentaService svc) : End
     public override void Configure()
     {
         Put("api/cotizaciones/{id:int}/aprobar");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -71,7 +67,6 @@ public sealed class RechazarCotizacionEndpoint(ICotizacionVentaService svc) : En
     public override void Configure()
     {
         Put("api/cotizaciones/{id:int}/rechazar");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

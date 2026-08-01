@@ -9,7 +9,6 @@ public sealed class RegistrarAnimalEndpoint(IAnimalService svc) : Endpoint<Crear
     public override void Configure()
     {
         Post("api/animales");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CrearAnimalRequest req, CancellationToken ct)
@@ -24,7 +23,6 @@ public sealed class ObtenerAnimalEndpoint(IAnimalService svc) : EndpointWithoutR
     public override void Configure()
     {
         Get("api/animales/{id:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -44,7 +42,6 @@ public sealed class ListarAnimalesActivosEndpoint(IAnimalService svc) : Endpoint
     public override void Configure()
     {
         Get("api/animales/activos");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -56,7 +53,6 @@ public sealed class ListarAnimalesPorFincaEndpoint(IAnimalService svc) : Endpoin
     public override void Configure()
     {
         Get("api/animales/finca/{idFinca:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -68,7 +64,6 @@ public sealed class CambiarEstadoAnimalEndpoint(IAnimalService svc) : Endpoint<C
     public override void Configure()
     {
         Put("api/animales/{id:int}/estado");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CambiarEstadoAnimalRequest req, CancellationToken ct)
@@ -83,7 +78,6 @@ public sealed class TrasladarAnimalEndpoint(IAnimalService svc) : Endpoint<Trasl
     public override void Configure()
     {
         Put("api/animales/{id:int}/trasladar");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(TrasladarAnimalRequest req, CancellationToken ct)
@@ -98,7 +92,6 @@ public sealed class HistorialAnimalEndpoint(IAnimalService svc) : EndpointWithou
     public override void Configure()
     {
         Get("api/animales/{id:int}/historial");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -110,7 +103,6 @@ public sealed class MovimientosAnimalEndpoint(IAnimalService svc) : EndpointWith
     public override void Configure()
     {
         Get("api/animales/{id:int}/movimientos");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -122,7 +114,6 @@ public sealed class CrearPedigriEndpoint(IAnimalService svc) : Endpoint<CrearPed
     public override void Configure()
     {
         Post("api/animales/pedigri");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CrearPedigriRequest req, CancellationToken ct)
@@ -134,7 +125,6 @@ public sealed class ObtenerPedigriEndpoint(IAnimalService svc) : EndpointWithout
     public override void Configure()
     {
         Get("api/animales/{id:int}/pedigri");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

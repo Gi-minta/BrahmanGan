@@ -9,7 +9,6 @@ public sealed class CrearPotreroEndpoint(IPotreroService svc) : Endpoint<CrearPo
     public override void Configure()
     {
         Post("api/potreros");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CrearPotreroRequest req, CancellationToken ct)
@@ -21,7 +20,6 @@ public sealed class ListarPotrerosPorFincaEndpoint(IPotreroService svc) : Endpoi
     public override void Configure()
     {
         Get("api/potreros/finca/{idFinca:int}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -34,7 +32,6 @@ public sealed class CrearGrupoManejoEndpoint(IPotreroService svc) : Endpoint<Cre
     public override void Configure()
     {
         Post("api/potreros/grupos");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CrearGrupoManejoRequest req, CancellationToken ct)
@@ -46,7 +43,6 @@ public sealed class ListarGruposManejoEndpoint(IPotreroService svc) : EndpointWi
     public override void Configure()
     {
         Get("api/potreros/grupos");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -59,7 +55,6 @@ public sealed class AsignarAnimalPotreroEndpoint(IPotreroService svc) : Endpoint
     public override void Configure()
     {
         Post("api/potreros/asignaciones");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(AsignarAnimalPotreroRequest req, CancellationToken ct)
@@ -71,7 +66,6 @@ public sealed class CerrarAsignacionPotreroEndpoint(IPotreroService svc) : Endpo
     public override void Configure()
     {
         Patch("api/potreros/asignaciones/{id:int}/cerrar");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CerrarAnimalPotreroRequest req, CancellationToken ct)
@@ -83,7 +77,6 @@ public sealed class ListarAnimalesPorPotreroEndpoint(IPotreroService svc) : Endp
     public override void Configure()
     {
         Get("api/potreros/{idPotrero:int}/animales");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -96,7 +89,6 @@ public sealed class RegistrarAcumulacionInsumoEndpoint(IPotreroService svc) : En
     public override void Configure()
     {
         Post("api/potreros/acumulaciones");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(RegistrarAcumulacionInsumoRequest req, CancellationToken ct)
@@ -108,7 +100,6 @@ public sealed class ListarAcumulacionesPorPotreroEndpoint(IPotreroService svc) :
     public override void Configure()
     {
         Get("api/potreros/{idPotrero:int}/acumulaciones");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

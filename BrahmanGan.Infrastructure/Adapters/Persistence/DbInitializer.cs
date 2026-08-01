@@ -57,12 +57,43 @@ public static class DbInitializer
 
             // ── Verificar si ya existe el admin ───────────────────────
             var adminEmailLower = adminEmail.ToLowerInvariant();
-            var adminExiste = await db.Usuarios
-                .AnyAsync(u => u.Email == adminEmailLower);
+            var adminExistente = await db.Usuarios
+                .FirstOrDefaultAsync(u => u.Email == adminEmailLower);
 
-            if (adminExiste)
+            if (adminExistente is not null)
             {
-                logger.LogInformation("DbInitializer: usuario admin ya existe, omitiendo seed.");
+                // El seed solo actúa sobre un admin nuevo, así que cambiar
+                // Seed:Admin:Password no tiene efecto una vez creado. Para no quedarse
+                // fuera sin acceso a la base de datos, Seed:Admin:ResetPassword=true
+                // fuerza el restablecimiento en el siguiente arranque.
+                //
+                // Exige una contraseña configurada a propósito: sin esa condición, el
+                // flag junto a un Seed:Admin:Password vacío dejaría al admin con una
+                // contraseña aleatoria distinta en cada reinicio.
+                if (!config.GetValue<bool>("Seed:Admin:ResetPassword"))
+                {
+                    logger.LogInformation("DbInitializer: usuario admin ya existe, omitiendo seed.");
+                    return;
+                }
+
+                if (passwordGenerada)
+                {
+                    logger.LogWarning(
+                        "DbInitializer: Seed:Admin:ResetPassword está activo pero no hay " +
+                        "Seed:Admin:Password configurada. No se restablece nada: definir " +
+                        "la contraseña es obligatorio para no dejar el admin con una " +
+                        "aleatoria distinta en cada arranque.");
+                    return;
+                }
+
+                adminExistente.CambiarPassword(hasher.Hashear(adminPassword!));
+                await db.SaveChangesAsync();
+
+                logger.LogWarning(
+                    "DbInitializer: contraseña del usuario admin RESTABLECIDA desde " +
+                    "Seed:Admin:Password para {Email}. Quita Seed:Admin:ResetPassword " +
+                    "(o ponlo en false) para que no vuelva a aplicarse en cada arranque.",
+                    adminEmail);
                 return;
             }
 
