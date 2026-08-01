@@ -3,19 +3,14 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Eraser } from 'lucide-react';
 import { useAuth } from '../auth/useAuth';
 
-type Tab = 'login' | 'registro';
-
 export default function LoginPage() {
-  const { login, registrar, loginOAuth } = useAuth();
+  const { login, loginOAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: Location })?.from?.pathname ?? '/';
 
-  const [tab, setTab]         = useState<Tab>('login');
   const [email, setEmail]     = useState('');
-  const [nombre, setNombre]   = useState('');
   const [password, setPass]   = useState('');
-  const [confirmar, setConf]  = useState('');
   const [error, setError]     = useState('');
   const [cargando, setCarg]   = useState(false);
   const [verPass, setVerPass] = useState(false);
@@ -23,26 +18,19 @@ export default function LoginPage() {
   /** Vacía el formulario y el mensaje de error, sin cambiar de pestaña. */
   function limpiarCampos() {
     setEmail('');
-    setNombre('');
     setPass('');
-    setConf('');
     setError('');
     setVerPass(false);
   }
 
-  const hayAlgoEscrito = Boolean(email || nombre || password || confirmar);
+  const hayAlgoEscrito = Boolean(email || password);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError('');
     setCarg(true);
     try {
-      if (tab === 'login') {
-        await login(email, password);
-      } else {
-        if (password !== confirmar) { setError('Las contraseñas no coinciden.'); return; }
-        await registrar(email, nombre, password);
-      }
+      await login(email, password);
       navigate(from, { replace: true });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error de autenticación');
@@ -91,40 +79,16 @@ export default function LoginPage() {
 
         {/* Card */}
         <div className="bg-white rounded-3xl shadow-modal overflow-hidden border border-white/10">
-          {/* Tabs */}
-          <div className="flex bg-slate-50 border-b border-slate-100">
-            {(['login', 'registro'] as Tab[]).map(t => (
-              <button
-                key={t}
-                onClick={() => { setTab(t); setError(''); }}
-                className={`flex-1 py-3.5 text-sm font-semibold transition-all duration-150
-                  ${tab === t
-                    ? 'text-brand-700 border-b-2 border-brand-500 bg-white -mb-px'
-                    : 'text-slate-500 hover:text-slate-700'}`}
-              >
-                {t === 'login' ? 'Iniciar sesión' : 'Registrarse'}
-              </button>
-            ))}
+          {/* El alta de usuarios la hace un administrador desde Seguridad, así que
+              aquí solo se inicia sesión. */}
+          <div className="bg-slate-50 border-b border-slate-100 py-3.5">
+            <p className="text-center text-sm font-semibold text-brand-700">Iniciar sesión</p>
           </div>
 
           <form onSubmit={handleSubmit} className="p-8 space-y-4">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm">
                 {error}
-              </div>
-            )}
-
-            {tab === 'registro' && (
-              <div>
-                <label className="label">Nombre completo</label>
-                <input
-                  className="input"
-                  type="text"
-                  placeholder="María Rodríguez"
-                  value={nombre}
-                  onChange={e => setNombre(e.target.value)}
-                  required
-                />
               </div>
             )}
 
@@ -152,7 +116,7 @@ export default function LoginPage() {
                   onChange={e => setPass(e.target.value)}
                   required
                   minLength={8}
-                  autoComplete={tab === 'login' ? 'current-password' : 'new-password'}
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"
@@ -169,24 +133,6 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {tab === 'registro' && (
-              <div>
-                <label className="label">Confirmar contraseña</label>
-                <input
-                  className="input"
-                  // Sigue el mismo interruptor que el campo anterior: comparar dos
-                  // contraseñas con una visible y la otra oculta no ayuda a nadie.
-                  type={verPass ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  value={confirmar}
-                  onChange={e => setConf(e.target.value)}
-                  required
-                  minLength={8}
-                  autoComplete="new-password"
-                />
-              </div>
-            )}
-
             <button
               type="submit"
               disabled={cargando}
@@ -200,7 +146,7 @@ export default function LoginPage() {
                   </svg>
                   Procesando…
                 </span>
-              ) : tab === 'login' ? 'Ingresar' : 'Crear cuenta'}
+              ) : 'Ingresar'}
             </button>
 
             <button

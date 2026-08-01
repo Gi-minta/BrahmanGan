@@ -9,6 +9,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import { useAuth } from '../auth/useAuth';
+import CambioPasswordObligatorio from './CambioPasswordObligatorio';
 
 interface IconProps { className?: string }
 
@@ -369,6 +370,9 @@ export default function Layout() {
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto p-6">
+          {/* Tapa la aplicación mientras la contraseña siga siendo la que puso el
+              administrador. */}
+          {usuario?.debeCambiarPassword && <CambioPasswordObligatorio />}
           <Outlet />
         </main>
       </div>

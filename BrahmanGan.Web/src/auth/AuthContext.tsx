@@ -17,6 +17,8 @@ export interface UsuarioInfo {
   nombreCompleto: string;
   roles: string[];
   permisos: string[];
+  /** La contraseña la fijó un administrador: hay que obligar a cambiarla. */
+  debeCambiarPassword?: boolean;
 }
 
 export interface TokenResponse {
@@ -62,7 +64,6 @@ declare global {
 
 export interface AuthContextValue extends AuthState {
   login: (email: string, password: string) => Promise<void>;
-  registrar: (email: string, nombre: string, password: string) => Promise<void>;
   loginOAuth: (provider: 'google') => Promise<void>;
   logout: () => Promise<void>;
   tieneRol: (rol: string) => boolean;
@@ -127,16 +128,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [guardarTokens]);
 
   // ── Registro ────────────────────────────────────────────────
-  const registrar = useCallback(async (email: string, nombre: string, password: string) => {
-    const resp = await api.post<TokenResponse>('/auth/registrar', {
-      email,
-      nombreCompleto: nombre,
-      password,
-      confirmarPassword: password,
-    });
-    guardarTokens(resp);
-  }, [guardarTokens]);
-
   // ── OAuth2 Google ───────────────────────────────────────────
   // El ClientId lo publica el backend en /auth/oauth/config; si no está configurado allí,
   // la opción no se ofrece. Solo se envía el ID token: el backend valida su firma contra
@@ -193,9 +184,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AuthContextValue>(() => ({
     usuario, token, cargando,
-    login, registrar, loginOAuth, logout,
+    login, loginOAuth, logout,
     tieneRol, tienePermiso,
-  }), [usuario, token, cargando, login, registrar, loginOAuth, logout, tieneRol, tienePermiso]);
+  }), [usuario, token, cargando, login, loginOAuth, logout, tieneRol, tienePermiso]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

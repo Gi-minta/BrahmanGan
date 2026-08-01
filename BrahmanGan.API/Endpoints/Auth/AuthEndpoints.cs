@@ -30,24 +30,9 @@ public sealed class LoginEndpoint(IAuthServicio auth) : Endpoint<LoginRequest, T
         => await Send.OkAsync(await auth.LoginAsync(req, ct), ct);
 }
 
-/// <summary>
-/// Alta de un usuario. Reservada a administradores: el registro era anónimo, lo que
-/// permitía a cualquiera crearse una cuenta en la API pública.
-/// </summary>
-public sealed class RegistrarUsuarioEndpoint(IAuthServicio auth) : Endpoint<RegistrarUsuarioRequest, TokenResponse>
-{
-    public override void Configure()
-    {
-        Post("api/auth/registrar");
-        Policies("Administrador");
-    }
-
-    public override async Task HandleAsync(RegistrarUsuarioRequest req, CancellationToken ct)
-    {
-        var result = await auth.RegistrarAsync(req, ct);
-        await Send.ResponseAsync(result, 201, ct);
-    }
-}
+// El endpoint de registro público se retiró: permitía a cualquiera crearse una cuenta en
+// la API. El alta de usuarios vive ahora en POST api/usuarios, dentro del módulo de
+// Seguridad y reservada a administradores.
 
 /// <summary>Renovar el access token usando el refresh token.</summary>
 public sealed class RefreshTokenEndpoint(IAuthServicio auth) : Endpoint<RefreshTokenRequest, TokenResponse>
