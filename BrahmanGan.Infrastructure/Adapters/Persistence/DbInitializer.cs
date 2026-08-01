@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using BrahmanGan.Application.Ports.Input;
 using BrahmanGan.Domain.Modulos.Seguridad;
+using BrahmanGan.Infrastructure.Adapters.EventSourcing;
 
 namespace BrahmanGan.Infrastructure.Adapters.Persistence;
 
@@ -30,10 +31,11 @@ public static class DbInitializer
     public static async Task InicializarAsync(IServiceProvider services)
     {
         using var scope = services.CreateScope();
-        var db      = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var hasher  = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
-        var config  = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-        var logger  = scope.ServiceProvider.GetRequiredService<ILogger<ApplicationDbContext>>();
+        var db         = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var eventStore = scope.ServiceProvider.GetRequiredService<EventStoreDbContext>();
+        var hasher     = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+        var config     = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+        var logger     = scope.ServiceProvider.GetRequiredService<ILogger<ApplicationDbContext>>();
 
         var adminEmail  = config["Seed:Admin:Email"]?.Trim()  is { Length: > 0 } e ? e : DefaultAdminEmail;
         var adminNombre = config["Seed:Admin:Nombre"]?.Trim() is { Length: > 0 } n ? n : DefaultAdminNombre;
@@ -47,6 +49,11 @@ public static class DbInitializer
         {
             // Aplica migraciones pendientes automáticamente
             await db.Database.MigrateAsync();
+
+            // El event store tiene su propio DbContext y su propio set de migraciones, y
+            // puede apuntar a otra base de datos (EventStoreConnection). Debe migrarse aquí
+            // —y antes del return por admin existente— o la tabla DomainEvents nunca se crea.
+            await eventStore.Database.MigrateAsync();
 
             // ── Verificar si ya existe el admin ───────────────────────
             var adminEmailLower = adminEmail.ToLowerInvariant();

@@ -1,12 +1,16 @@
 # Migraciones PostgreSQL
 
-Contiene el set de migraciones EF Core para **PostgreSQL** (contexto `ApplicationDbContext`).
-La migración inicial (`*_Inicial`) ya está generada y crea el esquema completo con tipos
-nativos de Postgres (`text`, `timestamp without time zone`, `numeric`,
-`Npgsql:ValueGenerationStrategy`).
+Contiene los sets de migraciones EF Core para **PostgreSQL**, uno por cada `DbContext`:
+
+- **`ApplicationDbContext`** — esta carpeta. La migración inicial (`*_Inicial`) crea el
+  esquema ganadero completo con tipos nativos de Postgres (`text`,
+  `timestamp without time zone`, `numeric`, `Npgsql:ValueGenerationStrategy`).
+- **`EventStoreDbContext`** — subcarpeta `EventStoreDb/`. Crea la tabla `DomainEvents` del
+  event store con sus índices.
 
 Al arrancar la API con `Database:Provider=Postgres`, `DbInitializer` aplica automáticamente
-estas migraciones (`Database.MigrateAsync`) y siembra el usuario administrador.
+las migraciones de **ambos contextos** (`Database.MigrateAsync`) y siembra el usuario
+administrador.
 
 ## Regenerar / añadir migraciones
 
@@ -18,6 +22,16 @@ dotnet ef migrations add <Nombre> \
   --project BrahmanGan.Infrastructure.Migrations.Postgres \
   --startup-project BrahmanGan.API \
   --context ApplicationDbContext
+```
+
+Para el event store hay que añadir además la carpeta de salida, o EF mezclaría los dos sets:
+
+```bash
+dotnet ef migrations add <Nombre> \
+  --project BrahmanGan.Infrastructure.Migrations.Postgres \
+  --startup-project BrahmanGan.API \
+  --context EventStoreDbContext \
+  --output-dir Migrations/EventStoreDb
 ```
 
 Verifica que el SQL use tipos de PostgreSQL y no de SQL Server (`nvarchar`, `datetime2`,
