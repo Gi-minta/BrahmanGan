@@ -14,22 +14,24 @@ interface Modulo {
   desc: string;
   to: string;
   soloAdmin?: boolean;
+  /** Clave "Modulo:Accion" que exige el backend para leer el módulo. */
+  permiso?: string;
 }
 
 const MODULOS: Modulo[] = [
-  { icon: '🐄', label: 'Inventario Animal',  desc: 'Razas, pesajes, movimientos', to: '/inventario' },
-  { icon: '🌿', label: 'Finca & Potreros',   desc: 'Geografía, grupos, áreas',    to: '/finca' },
-  { icon: '🔬', label: 'Reproducción',        desc: 'Servicios, gestaciones',      to: '/reproduccion' },
-  { icon: '💊', label: 'Sanidad',             desc: 'Vacunas, tratamientos',       to: '/sanidad' },
-  { icon: '🥛', label: 'Producción Leche',    desc: 'Controles, calidad, ventas',  to: '/leche' },
-  { icon: '💼', label: 'Comercial',           desc: 'Clientes, contratos',         to: '/comercial' },
-  { icon: '💰', label: 'Costos',              desc: 'Centros, gastos, ingresos',   to: '/costos' },
-  { icon: '👷', label: 'Nómina',              desc: 'Trabajadores, jornales',      to: '/nomina' },
-  { icon: '📦', label: 'Almacén',             desc: 'Insumos, kardex',             to: '/almacen' },
-  { icon: '🚜', label: 'Equipos',             desc: 'Maquinaria, mantenimiento',   to: '/equipos' },
-  { icon: '📋', label: 'Trazabilidad ICA',    desc: 'Registros ICA oficiales',     to: '/trazabilidad' },
-  { icon: '🌱', label: 'Sostenibilidad',      desc: 'Carbono, agua, ambiente',     to: '/sostenibilidad' },
-  { icon: '📊', label: 'Reportes',            desc: 'KPIs, exportación, análisis', to: '/reportes' },
+  { icon: '🐄', label: 'Inventario Animal',  desc: 'Razas, pesajes, movimientos', to: '/inventario', permiso: 'Inventario:Leer' },
+  { icon: '🌿', label: 'Finca & Potreros',   desc: 'Geografía, grupos, áreas',    to: '/finca', permiso: 'Finca:Leer' },
+  { icon: '🔬', label: 'Reproducción',        desc: 'Servicios, gestaciones',      to: '/reproduccion', permiso: 'Reproduccion:Leer' },
+  { icon: '💊', label: 'Sanidad',             desc: 'Vacunas, tratamientos',       to: '/sanidad', permiso: 'Sanidad:Leer' },
+  { icon: '🥛', label: 'Producción Leche',    desc: 'Controles, calidad, ventas',  to: '/leche', permiso: 'Leche:Leer' },
+  { icon: '💼', label: 'Comercial',           desc: 'Clientes, contratos',         to: '/comercial', permiso: 'Comercial:Leer' },
+  { icon: '💰', label: 'Costos',              desc: 'Centros, gastos, ingresos',   to: '/costos', permiso: 'Costos:Leer' },
+  { icon: '👷', label: 'Nómina',              desc: 'Trabajadores, jornales',      to: '/nomina', permiso: 'Nomina:Leer' },
+  { icon: '📦', label: 'Almacén',             desc: 'Insumos, kardex',             to: '/almacen', permiso: 'Almacen:Leer' },
+  { icon: '🚜', label: 'Equipos',             desc: 'Maquinaria, mantenimiento',   to: '/equipos', permiso: 'Equipos:Leer' },
+  { icon: '📋', label: 'Trazabilidad ICA',    desc: 'Registros ICA oficiales',     to: '/trazabilidad', permiso: 'Trazabilidad:Leer' },
+  { icon: '🌱', label: 'Sostenibilidad',      desc: 'Carbono, agua, ambiente',     to: '/sostenibilidad', permiso: 'Sostenibilidad:Leer' },
+  { icon: '📊', label: 'Reportes',            desc: 'KPIs, exportación, análisis', to: '/reportes', permiso: 'Reportes:Leer' },
   { icon: '🔐', label: 'Seguridad',           desc: 'Roles, permisos, usuarios',   to: '/seguridad', soloAdmin: true },
 ];
 
@@ -57,17 +59,26 @@ interface KPIs {
 }
 
 export default function Dashboard() {
-  const { usuario, tieneRol } = useAuth();
+  const { usuario, tieneRol, tienePermiso } = useAuth();
   const esAdmin = tieneRol('Administrador');
-  const modulosVisibles = MODULOS.filter(m => !m.soloAdmin || esAdmin);
+  // Se ocultan los módulos sin permiso de lectura: entrar solo daría 403.
+  const modulosVisibles = MODULOS.filter(m =>
+    (!m.soloAdmin || esAdmin) && (!m.permiso || tienePermiso(m.permiso)));
 
   const [kpis, setKpis] = useState<KPIs>({ animalesActivos: null, fincas: null, alertasVacunas: null });
 
+  // Solo se piden los indicadores que el usuario puede leer: el resto devolvería 403 y
+  // dejaría la tarjeta en «…» de forma permanente, como si siguiera cargando.
+  const veAnimales = tienePermiso('Inventario:Leer');
+  const veFincas   = tienePermiso('Finca:Leer');
+  const veSanidad  = tienePermiso('Sanidad:Leer');
+
   useEffect(() => {
+    const nada = Promise.reject<never>(new Error('sin permiso'));
     Promise.allSettled([
-      api.get<Animal[]>('/animales/activos'),
-      api.get<Finca[]>('/fincas'),
-      api.get<Vacunacion[]>('/vacunaciones/alertas?dias=7'),
+      veAnimales ? api.get<Animal[]>('/animales/activos') : nada,
+      veFincas   ? api.get<Finca[]>('/fincas') : nada,
+      veSanidad  ? api.get<Vacunacion[]>('/vacunaciones/alertas?dias=7') : nada,
     ]).then(([animalesRes, fincasRes, alertasRes]) => {
       setKpis({
         animalesActivos: animalesRes.status === 'fulfilled' ? animalesRes.value.length : null,
@@ -75,7 +86,7 @@ export default function Dashboard() {
         alertasVacunas:  alertasRes.status === 'fulfilled' ? alertasRes.value.length : null,
       });
     });
-  }, []);
+  }, [veAnimales, veFincas, veSanidad]);
 
   function fmt(val: number | null) { return val == null ? '…' : String(val); }
 
@@ -89,6 +100,7 @@ export default function Dashboard() {
       valor: fmt(kpis.animalesActivos),
       gradient: 'from-brand-500 to-brand-700',
       alert: null as string | null,
+      visible: veAnimales,
     },
     {
       Icon: Landmark,
@@ -96,6 +108,7 @@ export default function Dashboard() {
       valor: fmt(kpis.fincas),
       gradient: 'from-emerald-400 to-emerald-600',
       alert: null,
+      visible: veFincas,
     },
     {
       Icon: Syringe,
@@ -103,6 +116,7 @@ export default function Dashboard() {
       valor: fmt(kpis.alertasVacunas),
       gradient: 'from-amber-400 to-orange-500',
       alert: kpis.alertasVacunas !== null && kpis.alertasVacunas > 0 ? 'Requiere atención' : null,
+      visible: veSanidad,
     },
   ];
 
@@ -124,7 +138,7 @@ export default function Dashboard() {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {STATS.map(s => {
+        {STATS.filter(s => s.visible).map(s => {
           const Icon = s.Icon;
           return (
             <div
