@@ -1,3 +1,4 @@
+using FastEndpoints;
 using BrahmanGan.Application;
 using BrahmanGan.Infrastructure;
 using BrahmanGan.Infrastructure.Adapters.Persistence;
@@ -6,14 +7,11 @@ using BrahmanGan.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ── Controladores ──────────────────────────────────────────────
-builder.Services.AddControllers()
-    .AddJsonOptions(opt =>
-        opt.JsonSerializerOptions.Converters.Add(
-            new System.Text.Json.Serialization.JsonStringEnumConverter()));
+// ── FastEndpoints ──────────────────────────────────────────────
+builder.Services.AddFastEndpoints();
 
-// ── Swagger ────────────────────────────────────────────────────
-builder.Services.AddSwaggerDocumentation();
+// ── OpenAPI + Scalar ───────────────────────────────────────────
+builder.Services.AddOpenApiDocumentation();
 
 // ── Clave de firma JWT (obligatoria; efímera solo en Development) ──
 BrahmanGan.API.Extensions.JwtKeyBootstrap.EnsureJwtSecretKey(builder.Configuration, builder.Environment);
@@ -55,7 +53,6 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwaggerDocumentation();
     app.UseCors("Frontend");
 }
 else
@@ -72,7 +69,16 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseFastEndpoints(c =>
+{
+    c.Serializer.Options.Converters.Add(
+        new System.Text.Json.Serialization.JsonStringEnumConverter());
+});
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseOpenApiDocumentation();
+}
 
 // ── Health checks ──────────────────────────────────────────────
 // /health      → estado general (incluye conectividad a la BD).

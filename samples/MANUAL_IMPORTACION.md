@@ -28,7 +28,7 @@ Módulos  →  Seleccionar módulo  →  Descargar plantilla (opcional)
          →  Ver resumen: Total · Exitosos · Fallidos + tabla de errores
 ```
 
-### Flujo vía API (Swagger / Postman)
+### Flujo vía API (Scalar / Postman)
 
 ```
 POST /api/importacion/{modulo}
