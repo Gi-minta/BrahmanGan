@@ -10,6 +10,13 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <!--
+      Google Identity Services. Necesario para el inicio de sesión con Google: expone
+      window.google.accounts.id, que devuelve el ID token que valida el backend.
+      Si OAuth:Google:ClientId no está configurado en el servidor, la app no lo inicializa
+      y el botón queda oculto.
+    -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
   </head>
   <body class="bg-slate-50 antialiased">
     <div id="root"></div>

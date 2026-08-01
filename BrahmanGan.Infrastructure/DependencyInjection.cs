@@ -37,6 +37,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IEventStore, EventStore>();
+        services.AddSingleton<IGoogleTokenValidator, GoogleTokenValidator>();
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
