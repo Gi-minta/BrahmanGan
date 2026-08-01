@@ -1,11 +1,17 @@
-# docker-compose para probar BrahmanGan con PostgreSQL.
+# docker-compose para probar BrahmanGan (API + frontend) con PostgreSQL.
 #
 #   docker compose up --build
 #
-# La API queda en http://localhost:8080 (Scalar UI: http://localhost:8080/scalar).
-# Al arrancar aplica automáticamente las migraciones de Postgres y siembra el usuario
-# admin por defecto (email admin@brahmangan.com; la contraseña por defecto se define en
-# DbInitializer y debe cambiarse tras el primer inicio de sesión).
+#   Frontend (la app):  http://localhost:5173
+#   API:                http://localhost:8080  (Scalar UI: /scalar)
+#
+# Reproduce la topología del despliegue: dos servicios separados, cada uno con su
+# URL, y el frontend haciendo de proxy de /api hacia la API del lado servidor. Es el
+# equivalente local de la API + el Static Site de Render con sus reglas de rewrite.
+#
+# Al arrancar, la API aplica automáticamente las migraciones de Postgres y siembra el
+# usuario admin por defecto (email admin@brahmangan.com; la contraseña por defecto se
+# define en DbInitializer y debe cambiarse tras el primer inicio de sesión).
 
 services:
   postgres:
@@ -50,6 +56,24 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+
+  # ── Frontend (React + Vite servido por nginx) ────────────────────────
+  web:
+    build:
+      context: ./BrahmanGan.Web
+    container_name: brahmangan-web
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      # 5173 es el puerto habitual del dev server de Vite, para no cambiar de URL
+      # según cómo levantes el frontend.
+      - "5173:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   pgdata:
