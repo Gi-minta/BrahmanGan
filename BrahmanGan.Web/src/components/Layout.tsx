@@ -12,8 +12,10 @@ import { useAuth } from '../auth/useAuth';
 
 interface IconProps { className?: string }
 
-interface NavLeaf  { icon: ComponentType<IconProps>; label: string; to: string; rol?: string }
-interface NavGroup { icon: ComponentType<IconProps>; label: string; children: NavLeaf[]; rol?: string }
+// `permiso` es la clave "Modulo:Accion" que exige el backend para leer ese módulo.
+// Si el usuario no la tiene, la entrada no se muestra: pulsarla solo daría un 403.
+interface NavLeaf  { icon: ComponentType<IconProps>; label: string; to: string; rol?: string; permiso?: string }
+interface NavGroup { icon: ComponentType<IconProps>; label: string; children: NavLeaf[]; rol?: string; permiso?: string }
 type NavEntry = NavLeaf | NavGroup;
 
 function isGroup(e: NavEntry): e is NavGroup { return 'children' in e; }
@@ -35,17 +37,19 @@ const NAV_SECTIONS: NavSection[] = [
     entries: [
       {
         icon: Beef, label: 'Ganado', children: [
-          { icon: Beef,         label: 'Inventario',   to: '/inventario' },
-          { icon: FlaskConical, label: 'Reproducción', to: '/reproduccion' },
-          { icon: Syringe,      label: 'Sanidad',      to: '/sanidad' },
-          { icon: Milk,         label: 'Leche',        to: '/leche' },
+          { icon: Beef,         label: 'Inventario',   to: '/inventario',   permiso: 'Inventario:Leer' },
+          { icon: FlaskConical, label: 'Reproducción', to: '/reproduccion', permiso: 'Reproduccion:Leer' },
+          { icon: Syringe,      label: 'Sanidad',      to: '/sanidad',      permiso: 'Sanidad:Leer' },
+          { icon: Milk,         label: 'Leche',        to: '/leche',        permiso: 'Leche:Leer' },
         ],
       },
       {
         icon: Landmark, label: 'Finca', children: [
-          { icon: Landmark,  label: 'Finca & Potreros', to: '/finca' },
-          { icon: Wheat,     label: 'Alimentación',     to: '/alimentacion' },
-          { icon: RefreshCw, label: 'Pastoreo',         to: '/pastoreo' },
+          { icon: Landmark,  label: 'Finca & Potreros', to: '/finca',        permiso: 'Finca:Leer' },
+          // Alimentación y Pastoreo no tienen módulo propio en el backend: sus
+          // endpoints exigen Inventario y Finca respectivamente.
+          { icon: Wheat,     label: 'Alimentación',     to: '/alimentacion', permiso: 'Inventario:Leer' },
+          { icon: RefreshCw, label: 'Pastoreo',         to: '/pastoreo',     permiso: 'Finca:Leer' },
         ],
       },
     ],
@@ -55,15 +59,15 @@ const NAV_SECTIONS: NavSection[] = [
     entries: [
       {
         icon: ShoppingCart, label: 'Operaciones', children: [
-          { icon: ShoppingCart, label: 'Comercial', to: '/comercial' },
-          { icon: DollarSign,   label: 'Costos',    to: '/costos' },
-          { icon: Users,        label: 'Nómina',    to: '/nomina' },
+          { icon: ShoppingCart, label: 'Comercial', to: '/comercial', permiso: 'Comercial:Leer' },
+          { icon: DollarSign,   label: 'Costos',    to: '/costos',    permiso: 'Costos:Leer' },
+          { icon: Users,        label: 'Nómina',    to: '/nomina',    permiso: 'Nomina:Leer' },
         ],
       },
       {
         icon: Package, label: 'Recursos', children: [
-          { icon: Package, label: 'Almacén', to: '/almacen' },
-          { icon: Tractor, label: 'Equipos', to: '/equipos' },
+          { icon: Package, label: 'Almacén', to: '/almacen', permiso: 'Almacen:Leer' },
+          { icon: Tractor, label: 'Equipos', to: '/equipos', permiso: 'Equipos:Leer' },
         ],
       },
     ],
@@ -73,13 +77,14 @@ const NAV_SECTIONS: NavSection[] = [
     entries: [
       {
         icon: Leaf, label: 'Sostenibilidad', children: [
-          { icon: ClipboardList, label: 'Trazabilidad',   to: '/trazabilidad' },
-          { icon: Leaf,          label: 'Sostenibilidad', to: '/sostenibilidad' },
+          { icon: ClipboardList, label: 'Trazabilidad',   to: '/trazabilidad',   permiso: 'Trazabilidad:Leer' },
+          { icon: Leaf,          label: 'Sostenibilidad', to: '/sostenibilidad', permiso: 'Sostenibilidad:Leer' },
         ],
       },
-      { icon: Upload,      label: 'Importación', to: '/importacion' },
-      { icon: BarChart3,   label: 'Reportes',    to: '/reportes' },
-      { icon: ShieldCheck, label: 'Seguridad',   to: '/seguridad', rol: 'Administrador' },
+      // La importación masiva está reservada a administradores en el backend.
+      { icon: Upload,      label: 'Importación', to: '/importacion', rol: 'Administrador' },
+      { icon: BarChart3,   label: 'Reportes',    to: '/reportes',    permiso: 'Reportes:Leer' },
+      { icon: ShieldCheck, label: 'Seguridad',   to: '/seguridad',   rol: 'Administrador' },
     ],
   },
 ];
@@ -137,7 +142,25 @@ export default function Layout() {
   }
 
   function hasPermission(entry: NavEntry) {
-    return !entry.rol || usuario?.roles.includes(entry.rol);
+    if (entry.rol && !usuario?.roles.includes(entry.rol)) return false;
+    if (entry.permiso && !usuario?.permisos.includes(entry.permiso)) return false;
+    return true;
+  }
+
+  /**
+   * Filtra las entradas de una sección aplicando rol y permiso, y poda los hijos de
+   * cada grupo. Un grupo que se queda sin hijos visibles desaparece: dejarlo abriría
+   * un desplegable vacío.
+   */
+  function entradasVisibles(entries: NavEntry[]): NavEntry[] {
+    return entries
+      .filter(hasPermission)
+      .map(entry => {
+        if (!isGroup(entry)) return entry;
+        const children = entry.children.filter(hasPermission);
+        return children.length > 0 ? { ...entry, children } : null;
+      })
+      .filter((e): e is NavEntry => e !== null);
   }
 
   const linkBase = (isActive: boolean, collapsed: boolean) =>
@@ -176,7 +199,7 @@ export default function Layout() {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-3 space-y-0.5 px-2">
           {NAV_SECTIONS.map((section, si) => {
-            const visibleEntries = section.entries.filter(hasPermission);
+            const visibleEntries = entradasVisibles(section.entries);
             if (visibleEntries.length === 0) return null;
 
             return (
