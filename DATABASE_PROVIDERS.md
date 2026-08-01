@@ -72,6 +72,13 @@ propio proyecto/assembly y el proveedor activo determina cuál se aplica en runt
 La selección de proveedor, cadena y assembly de migraciones está centralizada en
 `BrahmanGan.Infrastructure/Adapters/Persistence/DatabaseProviderResolver.cs`.
 
+Cada proyecto contiene **dos sets de migraciones independientes**, uno por `DbContext`:
+
+| Contexto | Ubicación dentro del proyecto | Tablas |
+|----------|-------------------------------|--------|
+| `ApplicationDbContext` | `Migrations/` | Esquema ganadero completo |
+| `EventStoreDbContext`  | `Migrations/EventStoreDb/` | `DomainEvents` |
+
 ### Generar / regenerar migraciones
 
 Requiere el **SDK de .NET 10** y `dotnet-ef`. Ejecuta con el proveedor deseado activo:
@@ -88,8 +95,19 @@ dotnet ef migrations add <Nombre> \
   --startup-project BrahmanGan.API
 ```
 
+Para el event store hay que indicar el contexto y su carpeta, ya que el proyecto alberga dos:
+
+```bash
+dotnet ef migrations add <Nombre> \
+  --project BrahmanGan.Infrastructure.Migrations.<Proveedor> \
+  --startup-project BrahmanGan.API \
+  --context EventStoreDbContext \
+  --output-dir Migrations/EventStoreDb
+```
+
 Al arrancar, `DbInitializer.InicializarAsync` aplica automáticamente las migraciones
-pendientes (`Database.MigrateAsync`) del proveedor activo y siembra el usuario administrador.
+pendientes (`Database.MigrateAsync`) de **ambos contextos** para el proveedor activo y
+siembra el usuario administrador.
 
 ## Notas técnicas
 
@@ -98,6 +116,11 @@ pendientes (`Database.MigrateAsync`) del proveedor activo y siembra el usuario a
   automáticamente (`now() at time zone 'utc'` / `LOCALTIMESTAMP`) en un único lugar
   (`ApplicationDbContext.OnModelCreating`), sin tocar las Configurations.
 - **Event Store**: `EventData` usa `text` en Postgres y `nvarchar(max)` en SQL Server.
+- **Event Store en la misma base de datos**: si `EventStoreConnection*` apunta a la misma BD
+  que `DefaultConnection*` (caso de `docker-compose` y de los hosting con una sola BD, como
+  Render), ambos contextos comparten la tabla `__EFMigrationsHistory`. Es correcto: los
+  `MigrationId` de cada set son distintos y `MigrateAsync` solo aplica los que faltan de su
+  propio assembly. Se migran en secuencia, nunca en paralelo.
 - **Timestamps de Npgsql**: se habilita `Npgsql.EnableLegacyTimestampBehavior` para mapear
   `DateTime` a `timestamp without time zone` (equivalente al `datetime2` de SQL Server) y
   evitar el modo estricto de Kind de Npgsql 6+.
