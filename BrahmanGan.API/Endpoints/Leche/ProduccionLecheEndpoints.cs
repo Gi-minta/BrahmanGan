@@ -9,6 +9,7 @@ public sealed class RegistrarProduccionLecheEndpoint(IProduccionLecheService svc
     public override void Configure()
     {
         Post("api/produccion-leche");
+        Permissions("Leche:Crear");
     }
 
     public override async Task HandleAsync(RegistrarProduccionLecheRequest req, CancellationToken ct)

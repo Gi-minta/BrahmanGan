@@ -9,6 +9,7 @@ public sealed class CrearRazaEndpoint(IRazaService svc) : Endpoint<CrearRazaRequ
     public override void Configure()
     {
         Post("api/razas");
+        Permissions("Inventario:Crear");
     }
 
     public override async Task HandleAsync(CrearRazaRequest req, CancellationToken ct)
@@ -20,6 +21,7 @@ public sealed class ListarRazasEndpoint(IRazaService svc) : EndpointWithoutReque
     public override void Configure()
     {
         Get("api/razas");
+        Permissions("Inventario:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)

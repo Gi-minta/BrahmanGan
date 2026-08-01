@@ -73,6 +73,11 @@ app.UseFastEndpoints(c =>
 {
     c.Serializer.Options.Converters.Add(
         new System.Text.Json.Serialization.JsonStringEnumConverter());
+
+    // Los permisos viajan en el claim "permiso" (lo emite AuthServicio con la clave
+    // "Modulo:Accion" de Permiso.Clave). FastEndpoints busca "permissions" por defecto,
+    // así que sin esto Permissions(...) no encontraría ninguno y todo daría 403.
+    c.Security.PermissionsClaimType = "permiso";
 });
 
 // La documentación (Scalar en /scalar y el JSON en /swagger/v1/swagger.json) se publica

@@ -9,6 +9,7 @@ public sealed class RegistrarControlLecheEndpoint(IControlLecheService svc) : En
     public override void Configure()
     {
         Post("api/control-leche");
+        Permissions("Leche:Crear");
     }
 
     public override async Task HandleAsync(RegistrarControlLecheRequest req, CancellationToken ct)
@@ -20,6 +21,7 @@ public sealed class ListarControlLechePorAnimalEndpoint(IControlLecheService svc
     public override void Configure()
     {
         Get("api/control-leche/animal/{idAnimal:int}");
+        Permissions("Leche:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -38,6 +40,7 @@ public sealed class IniciarLactanciaEndpoint(IControlLecheService svc) : Endpoin
     public override void Configure()
     {
         Post("api/control-leche/lactancias");
+        Permissions("Leche:Crear");
     }
 
     public override async Task HandleAsync(IniciarParametroLactanciaRequest req, CancellationToken ct)
@@ -49,6 +52,7 @@ public sealed class CerrarLactanciaEndpoint(IControlLecheService svc) : Endpoint
     public override void Configure()
     {
         Patch("api/control-leche/lactancias/{id:int}/cerrar");
+        Permissions("Leche:Editar");
     }
 
     public override async Task HandleAsync(CerrarParametroLactanciaRequest req, CancellationToken ct)
@@ -60,6 +64,7 @@ public sealed class ListarLactanciasPorAnimalEndpoint(IControlLecheService svc) 
     public override void Configure()
     {
         Get("api/control-leche/lactancias/animal/{idAnimal:int}");
+        Permissions("Leche:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -72,6 +77,7 @@ public sealed class RegistrarCalidadLecheEndpoint(IControlLecheService svc) : En
     public override void Configure()
     {
         Post("api/control-leche/calidad");
+        Permissions("Leche:Crear");
     }
 
     public override async Task HandleAsync(RegistrarCalidadLecheRequest req, CancellationToken ct)
@@ -83,6 +89,7 @@ public sealed class ListarCalidadLechePorFechaEndpoint(IControlLecheService svc)
     public override void Configure()
     {
         Get("api/control-leche/calidad");
+        Permissions("Leche:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)

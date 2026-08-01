@@ -9,6 +9,7 @@ public sealed class CrearGastoGeneralEndpoint(IGastoGeneralService svc) : Endpoi
     public override void Configure()
     {
         Post("api/gastos-generales");
+        Permissions("Costos:Crear");
     }
 
     public override async Task HandleAsync(CrearGastoGeneralRequest req, CancellationToken ct)
@@ -20,6 +21,7 @@ public sealed class ListarGastosPorPeriodoEndpoint(IGastoGeneralService svc) : E
     public override void Configure()
     {
         Get("api/gastos-generales");
+        Permissions("Costos:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)

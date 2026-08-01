@@ -55,6 +55,8 @@ public static class DbInitializer
             // —y antes del return por admin existente— o la tabla DomainEvents nunca se crea.
             await eventStore.Database.MigrateAsync();
 
+            await SembrarPermisosDeRolesAsync(db, logger);
+
             // ── Verificar si ya existe el admin ───────────────────────
             var adminEmailLower = adminEmail.ToLowerInvariant();
             var adminExistente = await db.Usuarios
@@ -142,6 +144,89 @@ public static class DbInitializer
             logger.LogError(ex, "DbInitializer: error al inicializar la base de datos.");
             throw;
         }
+    }
+
+    /// <summary>
+    /// Da a cada rol de sistema un juego de permisos por defecto acorde a su nombre.
+    /// </summary>
+    /// <remarks>
+    /// El seed de EF solo asigna permisos al rol Administrador, así que el resto se
+    /// quedaba a cero. Como los endpoints ahora exigen <c>Modulo:Accion</c>, un usuario
+    /// de cualquier otro rol recibiría 403 en todo y la aplicación sería inservible para
+    /// él.
+    /// <para>
+    /// Solo actúa sobre los roles que no tienen ningún permiso: así no pisa los ajustes
+    /// que se hagan luego desde el módulo de Seguridad, y repetir el arranque no cambia
+    /// nada. Es un punto de partida razonable, no una política definitiva.
+    /// </para>
+    /// </remarks>
+    private static async Task SembrarPermisosDeRolesAsync(
+        ApplicationDbContext db,
+        ILogger logger)
+    {
+        // Todo lo operativo del día a día, sin el módulo de Seguridad.
+        ModuloSistema[] operativos =
+        [
+            ModuloSistema.Inventario, ModuloSistema.Finca, ModuloSistema.Reproduccion,
+            ModuloSistema.Sanidad, ModuloSistema.Leche, ModuloSistema.Comercial,
+            ModuloSistema.Costos, ModuloSistema.Nomina, ModuloSistema.Almacen,
+            ModuloSistema.Equipos, ModuloSistema.Trazabilidad, ModuloSistema.Sostenibilidad,
+            ModuloSistema.Reportes
+        ];
+
+        var porDefecto = new Dictionary<string, (ModuloSistema[] Modulos, AccionPermiso[] Acciones)>
+        {
+            // Gestiona la operación completa, pero no administra la seguridad.
+            ["Gerente"] =
+                (operativos,
+                 [AccionPermiso.Leer, AccionPermiso.Crear, AccionPermiso.Editar,
+                  AccionPermiso.Eliminar, AccionPermiso.Exportar]),
+
+            // Su ámbito es la salud y la reproducción; del resto solo consulta.
+            ["Veterinario"] =
+                ([ModuloSistema.Sanidad, ModuloSistema.Reproduccion],
+                 [AccionPermiso.Leer, AccionPermiso.Crear, AccionPermiso.Editar]),
+
+            // Registra actividad diaria: crea y edita, no borra.
+            ["Operador"] =
+                ([ModuloSistema.Inventario, ModuloSistema.Finca, ModuloSistema.Leche,
+                  ModuloSistema.Sanidad, ModuloSistema.Almacen, ModuloSistema.Equipos],
+                 [AccionPermiso.Leer, AccionPermiso.Crear, AccionPermiso.Editar]),
+
+            // Solo lectura y exportación, en todo.
+            ["Auditor"] =
+                (operativos, [AccionPermiso.Leer, AccionPermiso.Exportar])
+        };
+
+        var roles = await db.Roles
+            .Include(r => r.RolesPermiso)
+            .Where(r => porDefecto.Keys.Contains(r.Nombre))
+            .ToListAsync();
+
+        var permisos = await db.Permisos.ToListAsync();
+        var asignados = 0;
+
+        foreach (var rol in roles)
+        {
+            if (rol.RolesPermiso.Count > 0)
+                continue;
+
+            var (modulos, acciones) = porDefecto[rol.Nombre];
+            var aAsignar = permisos.Where(p => modulos.Contains(p.Modulo) && acciones.Contains(p.Accion));
+
+            foreach (var permiso in aAsignar)
+            {
+                rol.AsignarPermiso(permiso);
+                asignados++;
+            }
+
+            logger.LogInformation(
+                "DbInitializer: rol '{Rol}' no tenía permisos; se le asignan los de partida.",
+                rol.Nombre);
+        }
+
+        if (asignados > 0)
+            await db.SaveChangesAsync();
     }
 
     /// <summary>Genera una contraseña aleatoria fuerte (bytes criptográficos en base64url).</summary>

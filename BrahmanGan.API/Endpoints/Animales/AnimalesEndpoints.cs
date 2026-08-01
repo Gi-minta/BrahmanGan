@@ -9,6 +9,7 @@ public sealed class RegistrarAnimalEndpoint(IAnimalService svc) : Endpoint<Crear
     public override void Configure()
     {
         Post("api/animales");
+        Permissions("Inventario:Crear");
     }
 
     public override async Task HandleAsync(CrearAnimalRequest req, CancellationToken ct)
@@ -23,6 +24,7 @@ public sealed class ObtenerAnimalEndpoint(IAnimalService svc) : EndpointWithoutR
     public override void Configure()
     {
         Get("api/animales/{id:int}");
+        Permissions("Inventario:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -42,6 +44,7 @@ public sealed class ListarAnimalesActivosEndpoint(IAnimalService svc) : Endpoint
     public override void Configure()
     {
         Get("api/animales/activos");
+        Permissions("Inventario:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -53,6 +56,7 @@ public sealed class ListarAnimalesPorFincaEndpoint(IAnimalService svc) : Endpoin
     public override void Configure()
     {
         Get("api/animales/finca/{idFinca:int}");
+        Permissions("Inventario:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -64,6 +68,7 @@ public sealed class CambiarEstadoAnimalEndpoint(IAnimalService svc) : Endpoint<C
     public override void Configure()
     {
         Put("api/animales/{id:int}/estado");
+        Permissions("Inventario:Editar");
     }
 
     public override async Task HandleAsync(CambiarEstadoAnimalRequest req, CancellationToken ct)
@@ -78,6 +83,7 @@ public sealed class TrasladarAnimalEndpoint(IAnimalService svc) : Endpoint<Trasl
     public override void Configure()
     {
         Put("api/animales/{id:int}/trasladar");
+        Permissions("Inventario:Editar");
     }
 
     public override async Task HandleAsync(TrasladarAnimalRequest req, CancellationToken ct)
@@ -92,6 +98,7 @@ public sealed class HistorialAnimalEndpoint(IAnimalService svc) : EndpointWithou
     public override void Configure()
     {
         Get("api/animales/{id:int}/historial");
+        Permissions("Inventario:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -103,6 +110,7 @@ public sealed class MovimientosAnimalEndpoint(IAnimalService svc) : EndpointWith
     public override void Configure()
     {
         Get("api/animales/{id:int}/movimientos");
+        Permissions("Inventario:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -114,6 +122,7 @@ public sealed class CrearPedigriEndpoint(IAnimalService svc) : Endpoint<CrearPed
     public override void Configure()
     {
         Post("api/animales/pedigri");
+        Permissions("Inventario:Crear");
     }
 
     public override async Task HandleAsync(CrearPedigriRequest req, CancellationToken ct)
@@ -125,6 +134,7 @@ public sealed class ObtenerPedigriEndpoint(IAnimalService svc) : EndpointWithout
     public override void Configure()
     {
         Get("api/animales/{id:int}/pedigri");
+        Permissions("Inventario:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)

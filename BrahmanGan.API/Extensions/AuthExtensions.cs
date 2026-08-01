@@ -72,12 +72,11 @@ public static class AuthExtensions
             .AddPolicy("Gerente",        p => p.RequireRole("Administrador", "Gerente"))
             .AddPolicy("Veterinario",    p => p.RequireRole("Administrador", "Gerente", "Veterinario"))
             .AddPolicy("Operador",       p => p.RequireRole("Administrador", "Gerente", "Veterinario", "Operador"))
-            .AddPolicy("SoloLectura",    p => p.RequireAuthenticatedUser())
-            // Políticas basadas en permisos custom claim
-            .AddPolicy("perm:animales:crear",   p => p.RequireClaim("permiso", "Inventario:Crear"))
-            .AddPolicy("perm:animales:editar",  p => p.RequireClaim("permiso", "Inventario:Editar"))
-            .AddPolicy("perm:animales:eliminar",p => p.RequireClaim("permiso", "Inventario:Eliminar"))
-            .AddPolicy("perm:reportes",         p => p.RequireClaim("permiso", "Reportes:Exportar"));
+            .AddPolicy("SoloLectura",    p => p.RequireAuthenticatedUser());
+        // Los permisos por módulo no se declaran como políticas: cada endpoint los exige
+        // con Permissions("Modulo:Accion"), que FastEndpoints resuelve contra el claim
+        // "permiso" (configurado en Program.cs). Mantener aquí una política por cada
+        // combinación obligaría a declarar 84.
 
         return services;
     }
