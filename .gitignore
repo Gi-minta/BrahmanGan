@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# Salida de build del frontend (Vite). Render la reconstruye en cada despliegue
+# con `npm run build`, así que versionarla solo genera ruido en los diffs: cada
+# build cambia el hash de los ficheros de assets.
+BrahmanGan.Web/dist/
+BrahmanGan.Web/tsconfig.tsbuildinfo
