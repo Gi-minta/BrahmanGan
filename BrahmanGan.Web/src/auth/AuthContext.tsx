@@ -32,6 +32,34 @@ export interface AuthState {
   cargando: boolean;
 }
 
+/** Respuesta de /auth/oauth/config: disponibilidad y ClientId público de Google. */
+export interface OAuthConfig {
+  googleHabilitado: boolean;
+  googleClientId: string | null;
+}
+
+// Superficie mínima de Google Identity Services que usa la app (window.google.accounts.id).
+interface GisNotification {
+  isNotDisplayed: () => boolean;
+  isSkippedMoment: () => boolean;
+}
+
+declare global {
+  interface Window {
+    google?: {
+      accounts?: {
+        id?: {
+          initialize: (config: {
+            client_id: string;
+            callback: (response: { credential?: string }) => void;
+          }) => void;
+          prompt: (listener?: (notification: GisNotification) => void) => void;
+        };
+      };
+    };
+  }
+}
+
 export interface AuthContextValue extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   registrar: (email: string, nombre: string, password: string) => Promise<void>;
@@ -110,13 +138,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [guardarTokens]);
 
   // ── OAuth2 Google ───────────────────────────────────────────
+  // El ClientId lo publica el backend en /auth/oauth/config; si no está configurado allí,
+  // la opción no se ofrece. Solo se envía el ID token: el backend valida su firma contra
+  // Google y saca de él el correo y el identificador de cuenta.
   const loginOAuth = useCallback(async (_provider: 'google') => {
-    // En un flujo real se abriría una ventana popup con google.accounts.oauth2.initTokenClient
-    // Aquí mostramos la ventana y procesamos el callback.
-    // Para el MVP, redirigimos al endpoint de Google usando la librería GIS.
-    // El backend /api/auth/oauth/google recibe { email, nombreCompleto, idExterno }.
-    throw new Error('Integra Google Identity Services en Login.tsx para obtener el ID token.');
-  }, []);
+    const config = await api.get<OAuthConfig>('/auth/oauth/config');
+
+    if (!config.googleHabilitado || !config.googleClientId)
+      throw new Error(
+        'El inicio de sesión con Google no está habilitado. Configura OAuth__Google__ClientId en el servidor.',
+      );
+
+    const gis = window.google?.accounts?.id;
+    if (!gis)
+      throw new Error(
+        'No se pudo cargar Google Identity Services. Revisa la conexión o si un bloqueador lo está impidiendo.',
+      );
+
+    const credential = await new Promise<string>((resolve, reject) => {
+      gis.initialize({
+        client_id: config.googleClientId!,
+        callback: (resp) =>
+          resp.credential
+            ? resolve(resp.credential)
+            : reject(new Error('Google no devolvió ningún ID token.')),
+      });
+
+      // El diálogo puede no llegar a mostrarse (sin sesión de Google, cookies de terceros
+      // bloqueadas, cierre del usuario). Sin este aviso la promesa quedaría pendiente para
+      // siempre y el botón se quedaría girando.
+      gis.prompt((notification) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment())
+          reject(
+            new Error(
+              'No se pudo abrir el diálogo de Google. Inicia sesión en Google o permite las cookies de terceros.',
+            ),
+          );
+      });
+    });
+
+    const resp = await api.post<TokenResponse>('/auth/oauth/google', { idToken: credential });
+    guardarTokens(resp);
+  }, [guardarTokens]);
 
   // ── Logout ──────────────────────────────────────────────────
   const logout = useCallback(async () => {

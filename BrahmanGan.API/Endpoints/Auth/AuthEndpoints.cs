@@ -2,16 +2,18 @@ using System.Security.Claims;
 using FastEndpoints;
 using BrahmanGan.Application.DTOs;
 using BrahmanGan.Application.Ports.Input;
+using BrahmanGan.Application.Ports.Output;
 using BrahmanGan.Domain.Modulos.Seguridad;
 
 namespace BrahmanGan.API.Endpoints.Auth;
 
-/// <summary>Payload que envía el frontend tras el flujo OAuth2.</summary>
-public record OAuthCallbackRequest(
-    string Email,
-    string NombreCompleto,
-    string IdExterno,
-    string? IdToken = null);
+/// <summary>
+/// Payload que envía el frontend tras el flujo OAuth2: únicamente el ID token que emite
+/// Google. El correo, el nombre y el identificador de cuenta se leen del propio token una
+/// vez validado; aceptarlos del cliente permitiría a cualquiera pedir un token a nombre de
+/// quien quisiera.
+/// </summary>
+public record OAuthCallbackRequest(string IdToken);
 
 /// <summary>Login con email y contraseña.</summary>
 public sealed class LoginEndpoint(IAuthServicio auth) : Endpoint<LoginRequest, TokenResponse>
@@ -88,29 +90,60 @@ public sealed class CambiarPasswordEndpoint(IAuthServicio auth) : Endpoint<Cambi
 
 /// <summary>
 /// Login / registro vía Google OAuth2.
-/// El cliente SPA realiza el flujo OAuth en el navegador y envía el ID token de Google
-/// ya validado (o los datos del perfil). Para producción se debería validar el ID token
-/// de Google con la clave pública de Google; aquí se acepta el payload del cliente.
+/// El cliente hace el flujo en el navegador con Google Identity Services y envía aquí el
+/// ID token resultante. El token se valida contra Google —firma, emisor, caducidad y
+/// audiencia— y la identidad se toma de él.
 /// </summary>
-public sealed class LoginGoogleEndpoint(IAuthServicio auth) : Endpoint<OAuthCallbackRequest, TokenResponse>
+public sealed class LoginGoogleEndpoint(IAuthServicio auth, IGoogleTokenValidator google)
+    : Endpoint<OAuthCallbackRequest, TokenResponse>
 {
     public override void Configure()
     {
         Post("api/auth/oauth/google");
         // Anónimo por necesidad: es una vía de entrada alternativa al login, y quien la
-        // usa todavía no tiene token.
+        // usa todavía no tiene token. La credencial que autoriza es el ID token de Google,
+        // que se verifica antes de emitir nada.
         AllowAnonymous();
     }
 
     public override async Task HandleAsync(OAuthCallbackRequest req, CancellationToken ct)
     {
-        // En producción: verificar req.IdToken con Google APIs
+        var identidad = await google.ValidarAsync(req.IdToken, ct);
+
         var result = await auth.LoginOAuthAsync(
-            req.Email, req.NombreCompleto,
-            ProveedorAuth.Google, req.IdExterno, ct);
+            identidad.Email, identidad.NombreCompleto,
+            ProveedorAuth.Google, identidad.IdExterno, ct);
+
         await Send.OkAsync(result, ct);
     }
 }
+
+/// <summary>
+/// Indica al cliente si el login con Google está disponible y con qué ClientId.
+/// El ClientId es público por definición —viaja en la URL de autorización de Google— y el
+/// frontend lo necesita para inicializar Google Identity Services.
+/// </summary>
+public sealed class ConfiguracionOAuthEndpoint(IGoogleTokenValidator google, IConfiguration config)
+    : EndpointWithoutRequest<OAuthConfigResponse>
+{
+    public override void Configure()
+    {
+        Get("api/auth/oauth/config");
+        // Anónimo por necesidad: lo consulta la pantalla de login, antes de haber entrado.
+        // No expone secretos: solo un booleano y el ClientId público.
+        AllowAnonymous();
+    }
+
+    public override async Task HandleAsync(CancellationToken ct)
+        => await Send.OkAsync(
+            new OAuthConfigResponse(
+                google.EstaConfigurado,
+                google.EstaConfigurado ? config["OAuth:Google:ClientId"]?.Trim() : null),
+            ct);
+}
+
+/// <summary>Disponibilidad del login con Google y su ClientId público.</summary>
+public record OAuthConfigResponse(bool GoogleHabilitado, string? GoogleClientId);
 
 /// <summary>Perfil del usuario autenticado.</summary>
 public sealed class MeEndpoint : EndpointWithoutRequest<UsuarioInfoResponse>

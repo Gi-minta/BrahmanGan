@@ -5,7 +5,7 @@ import { useAuth } from '../auth/useAuth';
 type Tab = 'login' | 'registro';
 
 export default function LoginPage() {
-  const { login, registrar } = useAuth();
+  const { login, registrar, loginOAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: Location })?.from?.pathname ?? '/';
@@ -39,7 +39,15 @@ export default function LoginPage() {
 
   async function handleGoogle() {
     setError('');
-    setError('Configura Google OAuth2: agrega tu ClientId en appsettings.json y el script GIS en index.html.');
+    setCarg(true);
+    try {
+      await loginOAuth('google');
+      navigate(from, { replace: true });
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'No se pudo iniciar sesión con Google.');
+    } finally {
+      setCarg(false);
+    }
   }
 
   return (
