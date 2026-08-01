@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Eye, EyeOff, Eraser } from 'lucide-react';
 import { useAuth } from '../auth/useAuth';
 
 type Tab = 'login' | 'registro';
@@ -17,6 +18,19 @@ export default function LoginPage() {
   const [confirmar, setConf]  = useState('');
   const [error, setError]     = useState('');
   const [cargando, setCarg]   = useState(false);
+  const [verPass, setVerPass] = useState(false);
+
+  /** Vacía el formulario y el mensaje de error, sin cambiar de pestaña. */
+  function limpiarCampos() {
+    setEmail('');
+    setNombre('');
+    setPass('');
+    setConf('');
+    setError('');
+    setVerPass(false);
+  }
+
+  const hayAlgoEscrito = Boolean(email || nombre || password || confirmar);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -129,16 +143,30 @@ export default function LoginPage() {
 
             <div>
               <label className="label">Contraseña</label>
-              <input
-                className="input"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={e => setPass(e.target.value)}
-                required
-                minLength={8}
-                autoComplete={tab === 'login' ? 'current-password' : 'new-password'}
-              />
+              <div className="relative">
+                <input
+                  className="input pr-11"
+                  type={verPass ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={e => setPass(e.target.value)}
+                  required
+                  minLength={8}
+                  autoComplete={tab === 'login' ? 'current-password' : 'new-password'}
+                />
+                <button
+                  type="button"
+                  onClick={() => setVerPass(v => !v)}
+                  // aria-label y aria-pressed para que un lector de pantalla anuncie
+                  // el estado; el icono por sí solo no comunica nada.
+                  aria-label={verPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  aria-pressed={verPass}
+                  title={verPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 hover:text-slate-600 transition-colors rounded-r-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                >
+                  {verPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
 
             {tab === 'registro' && (
@@ -146,7 +174,9 @@ export default function LoginPage() {
                 <label className="label">Confirmar contraseña</label>
                 <input
                   className="input"
-                  type="password"
+                  // Sigue el mismo interruptor que el campo anterior: comparar dos
+                  // contraseñas con una visible y la otra oculta no ayuda a nadie.
+                  type={verPass ? 'text' : 'password'}
                   placeholder="••••••••"
                   value={confirmar}
                   onChange={e => setConf(e.target.value)}
@@ -171,6 +201,18 @@ export default function LoginPage() {
                   Procesando…
                 </span>
               ) : tab === 'login' ? 'Ingresar' : 'Crear cuenta'}
+            </button>
+
+            <button
+              type="button"
+              onClick={limpiarCampos}
+              // Deshabilitado si no hay nada que limpiar, para no ofrecer una acción
+              // que no haría nada.
+              disabled={cargando || !hayAlgoEscrito}
+              className="w-full flex items-center justify-center gap-2 py-2 text-sm text-slate-500 font-medium rounded-xl hover:bg-slate-50 hover:text-slate-700 transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+            >
+              <Eraser className="w-4 h-4" />
+              Limpiar campos
             </button>
 
             <div className="flex items-center gap-3">
