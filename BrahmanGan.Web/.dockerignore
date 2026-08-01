@@ -1,0 +1,11 @@
+node_modules
+dist
+tsconfig.tsbuildinfo
+.vite
+
+# El build usa npm (package-lock.json); estos sobran en el contexto.
+pnpm-lock.yaml
+pnpm-workspace.yaml
+
+Dockerfile
+.dockerignore
