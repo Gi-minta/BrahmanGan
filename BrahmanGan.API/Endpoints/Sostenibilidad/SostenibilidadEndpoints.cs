@@ -10,6 +10,7 @@ public sealed class RegistrarCapturaCarbonoEndpoint(ISostenibilidadService svc) 
     public override void Configure()
     {
         Post("api/sostenibilidad/carbono");
+        Permissions("Sostenibilidad:Crear");
     }
 
     public override async Task HandleAsync(RegistrarCapturaCarbonoRequest req, CancellationToken ct)
@@ -21,6 +22,7 @@ public sealed class ListarCapturasCarbonoPorFincaEndpoint(ISostenibilidadService
     public override void Configure()
     {
         Get("api/sostenibilidad/carbono/finca/{idFinca:int}");
+        Permissions("Sostenibilidad:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -33,6 +35,7 @@ public sealed class RegistrarConsumoAguaEndpoint(ISostenibilidadService svc) : E
     public override void Configure()
     {
         Post("api/sostenibilidad/agua");
+        Permissions("Sostenibilidad:Crear");
     }
 
     public override async Task HandleAsync(RegistrarConsumoAguaRequest req, CancellationToken ct)
@@ -44,6 +47,7 @@ public sealed class ListarConsumoAguaPorFincaEndpoint(ISostenibilidadService svc
     public override void Configure()
     {
         Get("api/sostenibilidad/agua/finca/{idFinca:int}");
+        Permissions("Sostenibilidad:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -56,6 +60,7 @@ public sealed class RegistrarEventoMedioambientalEndpoint(ISostenibilidadService
     public override void Configure()
     {
         Post("api/sostenibilidad/eventos");
+        Permissions("Sostenibilidad:Crear");
     }
 
     public override async Task HandleAsync(RegistrarEventoMedioambientalRequest req, CancellationToken ct)
@@ -67,6 +72,7 @@ public sealed class ListarEventosMedioambientalesPorFincaEndpoint(ISostenibilida
     public override void Configure()
     {
         Get("api/sostenibilidad/eventos/finca/{idFinca:int}");
+        Permissions("Sostenibilidad:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)

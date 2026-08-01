@@ -9,6 +9,7 @@ public sealed class ContratarTrabajadorEndpoint(ITrabajadorService svc) : Endpoi
     public override void Configure()
     {
         Post("api/trabajadores");
+        Permissions("Nomina:Crear");
     }
 
     public override async Task HandleAsync(ContratarTrabajadorRequest req, CancellationToken ct)
@@ -20,6 +21,7 @@ public sealed class ObtenerTrabajadorEndpoint(ITrabajadorService svc) : Endpoint
     public override void Configure()
     {
         Get("api/trabajadores/{id:int}");
+        Permissions("Nomina:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -39,6 +41,7 @@ public sealed class ListarTrabajadoresEndpoint(ITrabajadorService svc) : Endpoin
     public override void Configure()
     {
         Get("api/trabajadores");
+        Permissions("Nomina:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -50,6 +53,7 @@ public sealed class RegistrarPagoJornalEndpoint(ITrabajadorService svc) : Endpoi
     public override void Configure()
     {
         Post("api/trabajadores/pagos");
+        Permissions("Nomina:Crear");
     }
 
     public override async Task HandleAsync(RegistrarPagoJornalRequest req, CancellationToken ct)
@@ -61,6 +65,7 @@ public sealed class ListarPagosTrabajadorEndpoint(ITrabajadorService svc) : Endp
     public override void Configure()
     {
         Get("api/trabajadores/{id:int}/pagos");
+        Permissions("Nomina:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)

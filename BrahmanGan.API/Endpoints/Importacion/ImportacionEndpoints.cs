@@ -22,6 +22,10 @@ public abstract class ImportacionEndpointBase : Endpoint<ImportArchivoRequest, I
     {
         Post($"api/importacion/{Modulo}");
         AllowFileUploads();
+        // Reservada a administradores en vez de a un permiso por módulo: la base es
+        // genérica y no conoce a qué ModuloSistema corresponde su ruta, y una carga
+        // masiva puede crear miles de registros de una sola vez.
+        Policies("Administrador");
     }
 
     protected abstract Task<ImportResult> ImportarAsync(Stream archivo, CancellationToken ct);
@@ -257,6 +261,8 @@ public sealed class DescargarPlantillaEndpoint : EndpointWithoutRequest
     public override void Configure()
     {
         Get("api/importacion/plantilla/{modulo}");
+        // Mismo criterio que la carga: la plantilla solo la necesita quien va a importar.
+        Policies("Administrador");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -280,6 +286,7 @@ public sealed class ListarModulosImportacionEndpoint : EndpointWithoutRequest<IR
     public override void Configure()
     {
         Get("api/importacion/modulos");
+        Policies("Administrador");
     }
 
     public override async Task HandleAsync(CancellationToken ct)

@@ -9,6 +9,7 @@ public sealed class CrearIngresoEndpoint(IIngresoService svc) : Endpoint<CrearIn
     public override void Configure()
     {
         Post("api/ingresos");
+        Permissions("Costos:Crear");
     }
 
     public override async Task HandleAsync(CrearIngresoRequest req, CancellationToken ct)
@@ -20,6 +21,7 @@ public sealed class ListarIngresosPorCentroEndpoint(IIngresoService svc) : Endpo
     public override void Configure()
     {
         Get("api/ingresos/centro/{idCentro:int}");
+        Permissions("Costos:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)

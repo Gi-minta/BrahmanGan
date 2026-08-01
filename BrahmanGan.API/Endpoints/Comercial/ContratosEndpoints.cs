@@ -9,6 +9,7 @@ public sealed class CrearContratoEndpoint(IContratoService svc) : Endpoint<Crear
     public override void Configure()
     {
         Post("api/contratos");
+        Permissions("Comercial:Crear");
     }
 
     public override async Task HandleAsync(CrearContratoRequest req, CancellationToken ct)
@@ -20,6 +21,7 @@ public sealed class ListarContratosPorClienteEndpoint(IContratoService svc) : En
     public override void Configure()
     {
         Get("api/contratos/cliente/{idCliente:int}");
+        Permissions("Comercial:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)

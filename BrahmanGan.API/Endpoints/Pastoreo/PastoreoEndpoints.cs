@@ -9,6 +9,7 @@ public sealed class CrearPlanPastoreoEndpoint(IPastoreoService svc) : Endpoint<C
     public override void Configure()
     {
         Post("api/pastoreo/planes");
+        Permissions("Finca:Crear");
     }
 
     public override async Task HandleAsync(CrearPlanPastoreoRequest req, CancellationToken ct)
@@ -20,6 +21,7 @@ public sealed class ObtenerPlanPastoreoEndpoint(IPastoreoService svc) : Endpoint
     public override void Configure()
     {
         Get("api/pastoreo/planes/{id:int}");
+        Permissions("Finca:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -39,6 +41,7 @@ public sealed class ListarPlanesPastoreoEndpoint(IPastoreoService svc) : Endpoin
     public override void Configure()
     {
         Get("api/pastoreo/planes");
+        Permissions("Finca:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -50,6 +53,7 @@ public sealed class ListarPlanesPastoreoPorPotreroEndpoint(IPastoreoService svc)
     public override void Configure()
     {
         Get("api/pastoreo/planes/potrero/{idPotrero:int}");
+        Permissions("Finca:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -61,6 +65,7 @@ public sealed class FinalizarPlanPastoreoEndpoint(IPastoreoService svc) : Endpoi
     public override void Configure()
     {
         Patch("api/pastoreo/planes/{id:int}/finalizar");
+        Permissions("Finca:Editar");
     }
 
     public override async Task HandleAsync(CancellationToken ct)

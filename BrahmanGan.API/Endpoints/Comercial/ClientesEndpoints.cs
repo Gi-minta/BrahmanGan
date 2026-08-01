@@ -9,6 +9,7 @@ public sealed class CrearClienteEndpoint(IClienteService svc) : Endpoint<CrearCl
     public override void Configure()
     {
         Post("api/clientes");
+        Permissions("Comercial:Crear");
     }
 
     public override async Task HandleAsync(CrearClienteRequest req, CancellationToken ct)
@@ -20,6 +21,7 @@ public sealed class ObtenerClienteEndpoint(IClienteService svc) : EndpointWithou
     public override void Configure()
     {
         Get("api/clientes/{id:int}");
+        Permissions("Comercial:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -39,6 +41,7 @@ public sealed class ListarClientesEndpoint(IClienteService svc) : EndpointWithou
     public override void Configure()
     {
         Get("api/clientes");
+        Permissions("Comercial:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)

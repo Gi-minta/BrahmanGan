@@ -9,6 +9,7 @@ public sealed class CrearInsumoEndpoint(IInsumoService svc) : Endpoint<CrearInsu
     public override void Configure()
     {
         Post("api/insumos");
+        Permissions("Almacen:Crear");
     }
 
     public override async Task HandleAsync(CrearInsumoRequest req, CancellationToken ct)
@@ -20,6 +21,7 @@ public sealed class ObtenerInsumoEndpoint(IInsumoService svc) : EndpointWithoutR
     public override void Configure()
     {
         Get("api/insumos/{id:int}");
+        Permissions("Almacen:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -39,6 +41,7 @@ public sealed class ListarInsumosEndpoint(IInsumoService svc) : EndpointWithoutR
     public override void Configure()
     {
         Get("api/insumos");
+        Permissions("Almacen:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -50,6 +53,7 @@ public sealed class ListarInsumosBajoMinimoEndpoint(IInsumoService svc) : Endpoi
     public override void Configure()
     {
         Get("api/insumos/bajo-minimo");
+        Permissions("Almacen:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -61,6 +65,7 @@ public sealed class RegistrarMovimientoKardexEndpoint(IInsumoService svc) : Endp
     public override void Configure()
     {
         Post("api/insumos/movimiento");
+        Permissions("Almacen:Crear");
     }
 
     public override async Task HandleAsync(RegistrarMovimientoKardexRequest req, CancellationToken ct)
@@ -72,6 +77,7 @@ public sealed class KardexInsumoEndpoint(IInsumoService svc) : EndpointWithoutRe
     public override void Configure()
     {
         Get("api/insumos/{id:int}/kardex");
+        Permissions("Almacen:Leer");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
